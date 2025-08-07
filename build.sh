@@ -42,7 +42,7 @@ make systemimage -j$(nproc --all)
 
 build_date=$(date +%s)
 echo "Packing system image... build_date is ${build_date}"
-cd ~/MP01Support
+cd ~/MP01-LineageGSI
 cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "system.img"
 tar -czvf "system-${build_date}.tar.gz" ./system.img
 
