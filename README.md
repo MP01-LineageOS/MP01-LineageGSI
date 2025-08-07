@@ -5,6 +5,7 @@ You'll need to get familiar with [Git and Repo](https://source.android.com/sourc
 - [ ] Unlock & Flashing Guide
 - [ ] Refresh Panel (Refresh Button)
 - [ ] Integrate e-Ink Panel (With double press of refresh button)
+- [ ] Center Clock (Provide options? Is this a LOS feature??)
 - [ ] Port Minimal Boot/Shutdown Animation (Screen is properly turned off when shutting down)
 - [ ] Make default wallpaper(s) white
   - [ ] Include Styled B/W Wallpapers?
@@ -12,6 +13,8 @@ You'll need to get familiar with [Git and Repo](https://source.android.com/sourc
 - [ ] Build Signing
 - [ ] Make build script more fault tolerant
 - [ ] CI/CD for building
+- [ ] Enable VoLTE/VoWifi by default
+- [ ] Integrate MTK IMS apk by default
 
 ### Display Notes
 > Currently I'm testing using v25 of the screen firmware, I'll include a way to migrate between builds at some point. I'll also provide a side-by-side so you can pick which version suits you the best.
