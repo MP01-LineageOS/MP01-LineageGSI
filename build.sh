@@ -14,29 +14,21 @@ mkdir -p .repo/local_manifests
 git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manifests -b 15-los-qpr2
 
 # this is destructive, but :shrug:
-if ! repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8; then
-    echo "repo sync failed."
-    read -p "Do you want to run 'git reset --hard' on all repos to try and fix the issue? [y/N]: " yn
-    case "$yn" in
-        [Yy]* )
-            repo forall -vc "git reset --hard"
-            repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8
-            ;;
-        * )
-            echo "Skipping git reset. Exiting."
-            exit 1
-            ;;
-    esac
-fi
+repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune --force-checkout --force-remove-dirty -j8
 
+# Apply TrebleDroid patches
+cd ~/los22
 bash ~/los22/MP01Support/patches/apply-patches.sh .
 
+# Generate treble makefiles
 cd ~/los22/device/phh/treble
 bash generate.sh lineage
 
+# Copy MP01 specific makefiles and vendor additions into vendor
 cp ~/los22/MP01Support/treble_arm64* ~/los22/device/phh/treble/
 cp -r ~/los22/MP01Support/vendor ~/los22/vendor/
 
+# Do tha thing
 source ~/los22/build/envsetup.sh
 lunch treble_arm64_bvN-bp1a-userdebug
 make systemimage -j$(nproc --all)
