@@ -2,7 +2,11 @@
 
 set -e
 
-source="$(readlink -f -- $1)"
+if [ -z "$1" ]; then
+    echo "Usage: $0 <source-directory>"
+    exit 1
+fi
+source="$(readlink -f -- "$1")"
 trebledroid="$source/patches/trebledroid"
 personal="$source/patches/personal"
 
