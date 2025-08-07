@@ -17,18 +17,23 @@ git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manif
 # this is destructive, but :shrug:
 repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune --force-checkout --force-remove-dirty -j8
 
+git clone https://github.com/chardidathing/MP01-LineageGSI.git MP01Support
+
 # Apply TrebleDroid patches
-cp -r ~/MP01Support/patches ~/los22/patches
+cp -r ~/los22/MP01Support/patches ~/los22/patches
 cd ~/los22
 bash ~/los22/MP01Support/patches/apply-patches.sh ~/los22
+rm -rf ~/los22/patches
 
 # Generate treble makefiles
 cd ~/los22/device/phh/treble
 bash generate.sh lineage
+cd ~/los22
 
 # Copy MP01 specific makefiles and vendor additions into vendor
 cp ~/los22/MP01Support/treble_arm64* ~/los22/device/phh/treble/
-cp -r ~/los22/MP01Support/vendor ~/los22/vendor/
+cp -r ~/los22/MP01Support/vendor ~/los22/
+rm -rf ~/los22/MP01Support # Cleanup before build to prevent build errors
 
 # Do tha thing
 source ~/los22/build/envsetup.sh
