@@ -9,6 +9,7 @@ fi
 source="$(readlink -f -- "$1")"
 trebledroid="$source/patches/trebledroid"
 personal="$source/patches/personal"
+minimal="$source/patches/minimal"
 
 printf "\n ### APPLYING TREBLEDROID PATCHES ###\n";
 sleep 1.0;
