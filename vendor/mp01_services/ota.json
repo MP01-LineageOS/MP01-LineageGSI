@@ -1,0 +1,11 @@
+{
+    "version": "2025-08-15 (LineageOS 22.2)",
+    "date": "1723708800",
+    "variants": [
+        {
+            "name": "minimallineage_arm64_bvN",
+            "size": "1",
+            "url": "https://example.com/meow.tar.xz"
+        }
+    ]
+}

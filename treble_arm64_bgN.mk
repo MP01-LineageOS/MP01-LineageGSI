@@ -4,6 +4,7 @@ $(call inherit-product, device/phh/treble/base.mk)
 
 $(call inherit-product, vendor/gapps/arm64/arm64-vendor.mk)
 $(call inherit-product, device/phh/treble/lineage.mk)
+$(call inherit-product, vendor/MP01_services/MP01_services.mk)
 
 PRODUCT_NAME := treble_arm64_bgN
 PRODUCT_DEVICE := tdgsi_arm64_ab

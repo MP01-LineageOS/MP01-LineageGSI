@@ -1,0 +1,7 @@
+# MP01_eink_daemon/etc/init/MP01_eink_daemon.rc
+
+service MP01_eink_server /system/bin/MP01_eink_server
+    disabled
+
+on property:sys.boot_completed=1
+    start MP01_eink_server
