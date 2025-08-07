@@ -13,7 +13,11 @@ repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 mkdir -p .repo/local_manifests
 git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manifests -b 15-los-qpr2
 
-repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8
+# this is destructive, but :shrug:
+if ! repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8; then
+    repo forall -vc "git reset --hard"
+    repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8
+fi
 
 bash ~/los22/MP01Support/patches/apply-patches.sh .
 
