@@ -15,8 +15,18 @@ git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manif
 
 # this is destructive, but :shrug:
 if ! repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8; then
-    repo forall -vc "git reset --hard"
-    repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8
+    echo "repo sync failed."
+    read -p "Do you want to run 'git reset --hard' on all repos to try and fix the issue? [y/N]: " yn
+    case "$yn" in
+        [Yy]* )
+            repo forall -vc "git reset --hard"
+            repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j8
+            ;;
+        * )
+            echo "Skipping git reset. Exiting."
+            exit 1
+            ;;
+    esac
 fi
 
 bash ~/los22/MP01Support/patches/apply-patches.sh .

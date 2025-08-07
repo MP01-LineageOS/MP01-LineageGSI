@@ -2,6 +2,10 @@ English | [Русский](README-RU.md)
 ### To get started with building LineageOS 22.2 GSI,
 You'll need to get familiar with [Git and Repo](https://source.android.com/source/using-repo.html) as well as [How to build a GSI](https://github.com/phhusson/treble_experimentations/wiki/How-to-build-a-GSI%3F).
 
+### Build Script (Testing)
+```bash
+bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/refs/heads/15/build.sh)
+```
 
 ### Create the directories
 
