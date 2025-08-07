@@ -18,6 +18,7 @@ git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manif
 repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune --force-checkout --force-remove-dirty -j8
 
 # Apply TrebleDroid patches
+cp -r ~/MP01Support/patches ~/los22/patches
 cd ~/los22
 bash ~/los22/MP01Support/patches/apply-patches.sh ~/los22
 
