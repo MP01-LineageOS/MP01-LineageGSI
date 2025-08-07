@@ -10,7 +10,7 @@ cd ~/los22
 
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 
-rm -r .repo/local_manifests
+rm -rf .repo/local_manifests
 mkdir -p .repo/local_manifests
 git clone https://github.com/chardidathing/treble_manifest.git .repo/local_manifests -b 15-los-qpr2
 
