@@ -19,7 +19,7 @@ repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune --f
 
 # Apply TrebleDroid patches
 cd ~/los22
-bash ~/los22/MP01Support/patches/apply-patches.sh .
+bash ~/los22/MP01Support/patches/apply-patches.sh ..
 
 # Generate treble makefiles
 cd ~/los22/device/phh/treble
