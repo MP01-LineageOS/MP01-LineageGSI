@@ -41,8 +41,10 @@ lunch treble_arm64_bvN-bp1a-userdebug
 make systemimage -j$(nproc --all)
 
 build_date=$(date +%s)
+echo "Packing system image... build_date is ${build_date}"
 cd ~/MP01Support
-tar -czvf "system-${build_date}.tar.gz" ../los22/out/target/product/tdgsi_arm64_ab/system.img
+cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "system.img"
+tar -czvf "system-${build_date}.tar.gz" ./system.img
 
 gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01"
 gh release upload "${build_date}" "system-${build_date}.tar.gz"
