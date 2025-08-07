@@ -8,9 +8,9 @@ $(call inherit-product, vendor/MP01_services/MP01_services.mk)
 
 PRODUCT_NAME := treble_arm64_bgN
 PRODUCT_DEVICE := tdgsi_arm64_ab
-PRODUCT_BRAND := google
-PRODUCT_SYSTEM_BRAND := google
-PRODUCT_MODEL := TrebleDroid
+PRODUCT_BRAND := Minimal
+PRODUCT_SYSTEM_BRAND := Minimal
+PRODUCT_MODEL := MP01
 
 # Overwrite the inherited "emulator" characteristics
 PRODUCT_CHARACTERISTICS := device
