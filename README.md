@@ -7,7 +7,7 @@ You'll need to get familiar with [Git and Repo](https://source.android.com/sourc
 - [x] Integrate e-Ink Panel (With double press of refresh button)
 - [ ] Center Clock (Provide options? Is this a LOS feature??)
 - [ ] Port Minimal Boot/Shutdown Animation (Screen is properly turned off when shutting down)
-- [ ] Make default wallpaper(s) white
+- [x] Make default wallpaper(s) white
   - [ ] Include Styled B/W Wallpapers?
 - [ ] White QS (Fix major ghosting in QS)
 - [ ] Build Signing
@@ -15,10 +15,11 @@ You'll need to get familiar with [Git and Repo](https://source.android.com/sourc
 - [ ] CI/CD for building
 - [ ] Setup VoLTE/VoWifi by default
 - [ ] Integrate MTK IMS apk by default
-- [ ] Call Audio Broken
+- [ ] Fix Call Audio (Basically doesn't work)
 - [ ] Fix Flickering in in "Clear" mode
 - [ ] Fix display off (Display backlight is turned off and content doesn't change)
     - [ ] Implement some kind of AOD 
+- [ ] Implement Custom Launcher [inkOS](https://github.com/gezimos/inkOS)
 
 ### Display Notes
 > Currently I'm testing using v25 of the screen firmware, I'll include a way to migrate between builds at some point. I'll also provide a side-by-side so you can pick which version suits you the best.
