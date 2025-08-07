@@ -17,7 +17,7 @@ index 172bb01..f737418 100644
 --include vendor/lineage/build/core/apicheck.mk
 +
 +# Bootanimation
-+TARGET_BOOT_ANIMATION_RES := 1080
++TARGET_BOOT_ANIMATION_RES := 600
 +
 +# Face unlock
 +TARGET_FACE_UNLOCK_SUPPORTED := true
