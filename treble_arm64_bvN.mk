@@ -18,6 +18,8 @@ PRODUCT_CHARACTERISTICS := device
 PRODUCT_PACKAGES += \
     inkos
 
+PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
+
 # inkOS is set as the default launcher - idk if this is right
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.launcher.home=app.inkos
