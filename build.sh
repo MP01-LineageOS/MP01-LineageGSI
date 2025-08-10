@@ -46,5 +46,5 @@ cd ~/MP01-LineageGSI
 cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "system.img"
 tar -czvf "system-${build_date}.tar.gz" ./system.img
 
-gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01"
+gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
 gh release upload "${build_date}" "system-${build_date}.tar.gz"
