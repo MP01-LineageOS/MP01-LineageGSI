@@ -15,8 +15,13 @@ PRODUCT_MODEL := MP01
 # Overwrite the inherited "emulator" characteristics
 PRODUCT_CHARACTERISTICS := device
 
+# include inkOS launcher
 PRODUCT_PACKAGES += \
-	inkOS
+    inkOS
+
+# inkOS is set as the default launcher - idk if this is right
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.launcher.home=app.inkos
 
 LINEAGE_BUILDTYPE := GAPPS
 LINEAGE_BUILD := GSI
