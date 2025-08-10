@@ -17,7 +17,7 @@ PRODUCT_CHARACTERISTICS := device
 
 # include inkOS launcher
 PRODUCT_PACKAGES += \
-    inkOS
+    inkos
 
 # inkOS is set as the default launcher - idk if this is right
 PRODUCT_PROPERTY_OVERRIDES += \

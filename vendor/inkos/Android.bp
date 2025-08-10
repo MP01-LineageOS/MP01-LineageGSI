@@ -1,0 +1,11 @@
+android_app_import {
+    name: "inkos",
+    apk: "inkos_v0.1.apk",
+    presigned: true,
+    certificate: "PRESIGNED",
+    sdk_version: "current",
+    min_sdk_version: "29",
+    overrides: ["inkos"],
+    installable: true,
+    system_ext_specific: true,
+}

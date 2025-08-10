@@ -33,6 +33,7 @@ cd ~/los22
 # Copy MP01 specific makefiles and vendor additions into vendor
 cp ~/los22/MP01Support/treble_arm64* ~/los22/device/phh/treble/
 cp -r ~/los22/MP01Support/vendor ~/los22/
+cp -r ~/los22/MP01Support/vendor/inkOS ~/los22/vendor/
 rm -rf ~/los22/MP01Support # Cleanup before build to prevent build errors
 
 # Do tha thing
