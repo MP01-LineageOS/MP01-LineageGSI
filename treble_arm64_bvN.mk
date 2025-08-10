@@ -14,7 +14,8 @@ PRODUCT_MODEL := MP01
 # Overwrite the inherited "emulator" characteristics
 PRODUCT_CHARACTERISTICS := device
 
-PRODUCT_PACKAGES += 
+PRODUCT_PACKAGES += \
+    inkOS
 
 LINEAGE_BUILDTYPE := VANILLA
 LINEAGE_EXTRAVERSION := -EXT4
