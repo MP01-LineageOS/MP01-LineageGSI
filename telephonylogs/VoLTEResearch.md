@@ -8,7 +8,7 @@ adb shell getprop | grep -i md # a lot of modem stats
 ```
 
 "Good" (In-Service - VoLTE on and working) state example:
-```
+```log
 [init.svc.ccci_mdinit]: [running]
 [init.svc.volte_md_status]: [running]
 [kcmdline.binder]: [c]
@@ -45,6 +45,7 @@ adb shell getprop | grep -i md # a lot of modem stats
 ```
 
 Fail Example:
+```log
 [init.svc.ccci_mdinit]: [running]
 [init.svc.volte_md_status]: [running]
 [kcmdline.binder]: [c]
@@ -78,7 +79,7 @@ Fail Example:
 [vendor.mtk.md1.status]: [ready]
 [vendor.ril.active.md]: [9]
 [vendor.ril.mux.ee.md1]: [0]
-
+```
 
 Carrier: Telstra
 OS: LineageOS (system-1754590735)

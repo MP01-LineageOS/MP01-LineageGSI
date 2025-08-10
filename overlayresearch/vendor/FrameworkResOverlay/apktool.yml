@@ -1,0 +1,23 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: FrameworkResOverlay.apk
+compressionType: false
+doNotCompress:
+- resources.arsc
+isFrameworkApk: false
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '31'
+  targetSdkVersion: '31'
+sharedLibrary: false
+sparseResources: false
+unknownFiles: {}
+usesFramework:
+  ids:
+  - 1
+  tag: null
+version: 2.7.0-dirty
+versionInfo:
+  versionCode: '31'
+  versionName: '12'

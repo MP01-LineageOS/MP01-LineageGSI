@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="config_network_type_tcp_buffers">
+        <item>GPRS:4092,8760,48000,4096,8760,48000</item>
+        <item>EDGE:4093,26280,70800,4096,16384,70800</item>
+        <item>UMTS:58254,1398100,4194304,58254,1398100,4194304</item>
+        <item>CDMA:4094,87380,262144,4096,16384,262144</item>
+        <item>1xRTT:16384,32768,131072,4096,16384,102400</item>
+        <item>EvDo_0:4094,87380,262144,4096,16384,262144</item>
+        <item>EvDo_A:4094,87380,262144,4096,16384,262144</item>
+        <item>HSDPA:58254,1398100,4194304,58254,1398100,4194304</item>
+        <item>HSUPA:58254,1398100,4194304,58254,1398100,4194304</item>
+        <item>HSPA:58254,1398100,4194304,58254,1398100,4194304</item>
+        <item>EvDo_B:4094,87380,262144,4096,16384,262144</item>
+        <item>eHRPD:131072,262144,1048576,4096,16384,524288</item>
+        <item>iDEN:4094,87380,262144,4096,16384,262144</item>
+        <item>LTE:2097152,4194304,8388608,262144,524288,2097152</item>
+        <item>HSPA+:58254,1398100,4194304,58254,1398100,4194304</item>
+        <item>GSM:4092,8760,48000,4096,8760,48000</item>
+        <item>TD_SCDMA:58254,349525,1048576,58254,349525,1048576</item>
+        <item>LTE_CA:4096,6291456,12582912,4096,1048576,2097152</item>
+        <item>NR_NSA:2097152,6291456,16777216,512000,2097152,8388608</item>
+        <item>NR_NSA_MMWAVE:2097152,6291456,16777216,512000,2097152,8388608</item>
+        <item>NR_SA:2097152,6291456,16777216,512000,2097152,8388608</item>
+        <item>NR_SA_MMWAVE:2097152,6291456,16777216,512000,2097152,8388608</item>
+    </string-array>
+    <string-array name="wfcOperatorErrorAlertMessages">
+        <item>Wi-Fi calling off</item>
+        <item>No cellular network available. Connect to an available Wi-Fi Network to make calls.</item>
+        <item>String to be decided</item>
+        <item>Error02: DNS Error</item>
+        <item>Error03: DNS Error</item>
+        <item>Error04: DNS Error</item>
+        <item>Error041: DNS Error</item>
+        <item>Error05: Invalid SIM card</item>
+        <item>Error07: Unable to Connect</item>
+        <item>Error081: Unable to connect</item>
+        <item>Error082: Unable to Connect</item>
+        <item>Error08: Unable to Connect</item>
+        <item>REG91: Unable to Connect</item>
+        <item>Error010: Invalid Certificate</item>
+        <item>Error101: Invalid Certificate</item>
+        <item>Error111: Invalid Certificate</item>
+        <item>Error011: Invalid Certificate</item>
+        <item>Error403: Unknown user</item>
+        <item>Error403: Roaming not allowed</item>
+        <item>Error403: Mismatch identities</item>
+        <item>Error403: authentication scheme unsupported</item>
+        <item>Error403: handset is blacklisted</item>
+        <item>REG09: Missing 911 Address</item>
+        <item>REG99: Unable to Connect</item>
+        <item>REG99: Unable to Connect</item>
+        <item>REG90: Unable to Connect</item>
+        <item>Emergency Calls over Wi-Fi is not allowed in this location</item>
+        <item>REG92: Wi-Fi Calling is not allowed in the current country</item>
+    </string-array>
+    <string-array name="wfcOperatorErrorNotificationMessages">
+        <item>Wi-Fi calling off</item>
+        <item>No cellular network available. Connect to an available Wi-Fi Network to make calls.</item>
+        <item>String to be decided</item>
+        <item>Error02: DNS Error</item>
+        <item>Error03: DNS Error</item>
+        <item>Error04: DNS Error</item>
+        <item>Error041: DNS Error</item>
+        <item>Error05: Invalid SIM card</item>
+        <item>Error07: Unable to Connect</item>
+        <item>Error081: Unable to connect</item>
+        <item>Error082: Unable to Connect</item>
+        <item>Error08: Unable to Connect</item>
+        <item>REG91: Unable to Connect</item>
+        <item>Error010: Invalid Certificate</item>
+        <item>Error101: Invalid Certificate</item>
+        <item>Error111: Invalid Certificate</item>
+        <item>Error011: Invalid Certificate</item>
+        <item>Error403: Unknown user</item>
+        <item>Error403: Roaming not allowed</item>
+        <item>Error403: Mismatch identities</item>
+        <item>Error403: authentication scheme unsupported</item>
+        <item>Error403: handset is blacklisted</item>
+        <item>REG09: Missing 911 Address</item>
+        <item>REG99: Unable to Connect</item>
+        <item>REG99: Unable to Connect</item>
+        <item>REG90: Unable to Connect</item>
+        <item>Emergency Calls over Wi-Fi is not allowed in this location</item>
+        <item>REG92: Wi-Fi Calling is not allowed in the current country</item>
+    </string-array>
+</resources>

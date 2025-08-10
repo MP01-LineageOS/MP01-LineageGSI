@@ -459,9 +459,3 @@ sensor 0x02 ACCELEROMETER Z
 sensor 0x03 GYROSCOPE X
 sensor 0x04 GYROSCOPE Y
 sensor 0x05 GYROSCOPE Z
-
-# Fix broken names, should fix alt keys?
-key KEY_LEFTALT    ALT_LEFT
-key KEY_RIGHTALT   ALT_RIGHT
-key KEY_LEFTSHIFT    SHIFT_LEFT
-key KEY_RIGHTSHIFT   SHIFT_RIGHT
