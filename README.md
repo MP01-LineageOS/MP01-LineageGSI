@@ -6,6 +6,13 @@ For known issues, bug reports, and future features see the project [issues](http
 ### Display Notes
 > Currently I'm testing using v25 of the screen firmware, I'll include a way to migrate between builds at some point. I'll also provide a side-by-side so you can pick which version suits you the best.
 
+### Current Workarounds
+1. Out of the box, the keyboard layout isn't fully functional, to fix this, open `FinQwerty` > `Physical Keyboard Settings` and change the layout to `QWERTY English Layout for Minimal Phone MP01`.
+2. IMS/VoLTE might not be working out of the box, once you connect to internet, it should get the config from [MP01Experiments/treble_presets](https://github.com/MP01Experiments/treble_presets), if the IMS APK didn't build properly, you'll need to reboot again and it should work.
+3. Call audio might not be working out of the box, once you connect to the internet it should get the config from [MP01Experiments/treble_presets](https://github.com/MP01Experiments/treble_presets).
+4. No launcher is set as the default. You can fix this when you open inkOS, it'll prompt you to set the default launcher.
+5. The dark theme is still the default, this is horrible on e-Ink, switch to Light during setup.
+
 ### Build Script (Testing)
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/refs/heads/15/build.sh)
