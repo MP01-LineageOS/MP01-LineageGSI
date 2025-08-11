@@ -106,8 +106,8 @@ if [[ "$UNSIGNED" != true ]]; then
     gh release upload "${build_date}" "$tar_filename"
 fi
 
-# Update OTA file and commit to repo
-echo "Updating OTA file and committing to repo..."
+# Update OTA file, commit, and push to repo
+echo "Updating OTA file, committing, and pushing to repo..."
 cd ~/MP01-LineageGSI
 
 # Get current date in human readable format
@@ -133,6 +133,11 @@ if [[ "$UNSIGNED" != true ]]; then
     ]
 }
 EOF
+
+  # Commit and push the updated ota.json
+  git add ota.json
+  git commit -m "Update OTA.json for build ${build_date} (${current_date})"
+  git push
 fi
 
 echo "Build completed successfully!"
