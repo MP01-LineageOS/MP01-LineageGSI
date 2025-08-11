@@ -44,7 +44,7 @@ finqwerty_apk="finqwerty-release.apk" # this will always stay the same
 download_url=$(curl -s https://api.github.com/repos/MP01Experiments/finqwerty/releases/latest \
   | jq -r --arg NAME "$finqwerty_apk" '.assets[] | select(.name == $NAME) | .browser_download_url')
 
-if [[ -z "$finqwerty_download_url" ]]; then
+if [[ -z "$browser_download_url" ]]; then
   echo "Asset $finqwerty_apk not found in latest release." >&2
   exit 1
 fi
