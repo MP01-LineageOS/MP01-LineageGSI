@@ -1,5 +1,5 @@
 android_app_import {
-    name: "inkos",
+    name: "finqwerty",
     apk: "finqwerty-release.apk",
     presigned: true,
     preprocessed: true,
