@@ -1,0 +1,155 @@
+From 182b5c9ebaa12eb474976a76f297717701f5a12a Mon Sep 17 00:00:00 2001
+From: Charlie Mizutsuki <charlie.mizutsuki@posteo.net>
+Date: Mon, 11 Aug 2025 09:20:20 +0000
+Subject: [PATCH] Add always dream function
+
+Change-Id: Iaffef56d3907472af56eb1994642aa41936f2f8d
+---
+ .../settingslib/dream/DreamBackend.java       | 20 ++++++++++-
+ .../server/dreams/DreamManagerService.java    | 35 +++++++++++++------
+ 2 files changed, 44 insertions(+), 11 deletions(-)
+
+diff --git a/packages/SettingsLib/src/com/android/settingslib/dream/DreamBackend.java b/packages/SettingsLib/src/com/android/settingslib/dream/DreamBackend.java
+index dc40304ba24a..b7afeac2539a 100644
+--- a/packages/SettingsLib/src/com/android/settingslib/dream/DreamBackend.java
++++ b/packages/SettingsLib/src/com/android/settingslib/dream/DreamBackend.java
+@@ -78,7 +78,7 @@ public class DreamBackend {
+     }
+ 
+     @Retention(RetentionPolicy.SOURCE)
+-    @IntDef({WHILE_CHARGING, WHILE_DOCKED, EITHER, NEVER})
++    @IntDef({WHILE_CHARGING, WHILE_DOCKED, EITHER, NEVER, ALWAYS})
+     public @interface WhenToDream {
+     }
+ 
+@@ -86,6 +86,7 @@ public class DreamBackend {
+     public static final int WHILE_DOCKED = 1;
+     public static final int EITHER = 2;
+     public static final int NEVER = 3;
++    public static final int ALWAYS = 4;
+ 
+     /**
+      * The type of dream complications which can be provided by a
+@@ -136,6 +137,8 @@ public class DreamBackend {
+             .DREAM_SETTING_CHANGED__WHEN_TO_DREAM__WHEN_TO_DREAM_WHILE_DOCKED_ONLY;
+     private static final int WHEN_TO_DREAM_CHARGING_OR_DOCKED = FrameworkStatsLog
+             .DREAM_SETTING_CHANGED__WHEN_TO_DREAM__WHEN_TO_DREAM_EITHER_CHARGING_OR_DOCKED;
++    private static final int WHEN_TO_DREAM_ALWAYS = FrameworkStatsLog
++            .DREAM_SETTING_CHANGED__WHEN_TO_DREAM__WHEN_TO_DREAM_EITHER_CHARGING_OR_DOCKED; // Use same as EITHER for now
+ 
+     private final Context mContext;
+     private final IDreamManager mDreamManager;
+@@ -280,6 +283,10 @@ public class DreamBackend {
+ 
+     @WhenToDream
+     public int getWhenToDreamSetting() {
++        // Check if ALWAYS is set first
++        if (getBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, 0)) {
++            return ALWAYS;
++        }
+         return isActivatedOnDock() && isActivatedOnSleep() ? EITHER
+                 : isActivatedOnDock() ? WHILE_DOCKED
+                         : isActivatedOnSleep() ? WHILE_CHARGING
+@@ -293,16 +300,25 @@ public class DreamBackend {
+             case WHILE_CHARGING:
+                 setActivatedOnDock(false);
+                 setActivatedOnSleep(true);
++                setBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, false);
+                 break;
+ 
+             case WHILE_DOCKED:
+                 setActivatedOnDock(true);
+                 setActivatedOnSleep(false);
++                setBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, false);
+                 break;
+ 
+             case EITHER:
+                 setActivatedOnDock(true);
+                 setActivatedOnSleep(true);
++                setBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, false);
++                break;
++
++            case ALWAYS:
++                setActivatedOnDock(true);
++                setActivatedOnSleep(true);
++                setBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, true);
+                 break;
+ 
+             case NEVER:
+@@ -550,6 +566,8 @@ public class DreamBackend {
+                 return WHEN_TO_DREAM_DOCKED;
+             case EITHER:
+                 return WHEN_TO_DREAM_CHARGING_OR_DOCKED;
++            case ALWAYS:
++                return WHEN_TO_DREAM_ALWAYS;
+             case NEVER:
+             default:
+                 return WHEN_TO_DREAM_UNSPECIFIED;
+diff --git a/services/core/java/com/android/server/dreams/DreamManagerService.java b/services/core/java/com/android/server/dreams/DreamManagerService.java
+index 0c04be10d06d..9d61a8308652 100644
+--- a/services/core/java/com/android/server/dreams/DreamManagerService.java
++++ b/services/core/java/com/android/server/dreams/DreamManagerService.java
+@@ -110,12 +110,13 @@ public final class DreamManagerService extends SystemService {
+ 
+     /** Constants for the when to activate dreams. */
+     @Retention(RetentionPolicy.SOURCE)
+-    @IntDef({DREAM_ON_DOCK, DREAM_ON_CHARGE, DREAM_ON_DOCK_OR_CHARGE})
++    @IntDef({DREAM_ON_DOCK, DREAM_ON_CHARGE, DREAM_ON_DOCK_OR_CHARGE, DREAM_ALWAYS})
+     public @interface WhenToDream {}
+     private static final int DREAM_DISABLED = 0x0;
+     private static final int DREAM_ON_DOCK = 0x1;
+     private static final int DREAM_ON_CHARGE = 0x2;
+     private static final int DREAM_ON_DOCK_OR_CHARGE = 0x3;
++    private static final int DREAM_ALWAYS = 0x4;
+ 
+     private final Object mLock = new Object();
+ 
+@@ -409,15 +410,25 @@ public final class DreamManagerService extends SystemService {
+         synchronized (mLock) {
+             final ContentResolver resolver = mContext.getContentResolver();
+ 
+-            final int activateWhenCharging = (Settings.Secure.getIntForUser(resolver,
+-                    Settings.Secure.SCREENSAVER_ACTIVATE_ON_SLEEP,
+-                    mDreamsActivatedOnChargeByDefault ? 1 : 0,
+-                    UserHandle.USER_CURRENT) != 0) ? DREAM_ON_CHARGE : DREAM_DISABLED;
+-            final int activateWhenDocked = (Settings.Secure.getIntForUser(resolver,
+-                    Settings.Secure.SCREENSAVER_ACTIVATE_ON_DOCK,
+-                    mDreamsActivatedOnDockByDefault ? 1 : 0,
+-                    UserHandle.USER_CURRENT) != 0) ? DREAM_ON_DOCK : DREAM_DISABLED;
+-            mWhenToDream = activateWhenCharging + activateWhenDocked;
++            // Check if ALWAYS is enabled first
++            final boolean activateAlways = (Settings.Secure.getIntForUser(resolver,
++                    Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS,
++                    0,
++                    UserHandle.USER_CURRENT) != 0);
++            
++            if (activateAlways) {
++                mWhenToDream = DREAM_ALWAYS;
++            } else {
++                final int activateWhenCharging = (Settings.Secure.getIntForUser(resolver,
++                        Settings.Secure.SCREENSAVER_ACTIVATE_ON_SLEEP,
++                        mDreamsActivatedOnChargeByDefault ? 1 : 0,
++                        UserHandle.USER_CURRENT) != 0) ? DREAM_ON_CHARGE : DREAM_DISABLED;
++                final int activateWhenDocked = (Settings.Secure.getIntForUser(resolver,
++                        Settings.Secure.SCREENSAVER_ACTIVATE_ON_DOCK,
++                        mDreamsActivatedOnDockByDefault ? 1 : 0,
++                        UserHandle.USER_CURRENT) != 0) ? DREAM_ON_DOCK : DREAM_DISABLED;
++                mWhenToDream = activateWhenCharging + activateWhenDocked;
++            }
+ 
+             mDreamsEnabledSetting = (Settings.Secure.getIntForUser(resolver,
+                     Settings.Secure.SCREENSAVER_ENABLED,
+@@ -500,6 +511,10 @@ public final class DreamManagerService extends SystemService {
+                 return false;
+             }
+ 
++            if (mWhenToDream == DREAM_ALWAYS) {
++                return true;
++            }
++
+             if ((mWhenToDream & DREAM_ON_CHARGE) == DREAM_ON_CHARGE) {
+                 return mIsCharging;
+             }
+-- 
+2.43.0
+
