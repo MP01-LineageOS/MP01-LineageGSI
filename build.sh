@@ -58,7 +58,16 @@ if [[ -z "$finqwerty_download_url" || "$finqwerty_download_url" == "null" ]]; th
   exit 1
 fi
 
-curl -L -o ~/los22/vendor/finqwerty/finqwerty-release.apk "$finqwerty_download_url" # Download latest release and dump in vendor/finqwerty
+curl -L -o ~/los22/vendor/finqwerty/finqwerty-release.apk "$finqwerty_download_url"
+
+# Validate APK using aapt if available
+if command -v aapt >/dev/null 2>&1; then
+    if ! aapt dump badging ~/los22/vendor/finqwerty/finqwerty-release.apk >/dev/null 2>&1; then
+        echo "ERROR: Downloaded file is not a valid APK (aapt validation failed)"
+        exit 1
+    fi
+    echo "APK validation successful"
+fi
 
 # Do tha thing
 source ~/los22/build/envsetup.sh
