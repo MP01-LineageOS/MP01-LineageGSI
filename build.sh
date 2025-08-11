@@ -71,6 +71,9 @@ if ! make target-files-package otatools -j$(nproc --all); then
   exit 1
 fi
 
+# Get current date in human readable format
+current_date=$(date '+%Y-%m-%d')
+# Get current timestamp
 build_date=$(date +%s)
 echo "Packing and signing system image... build_date is ${build_date}"
 cd ~/MP01-LineageGSI
@@ -99,31 +102,18 @@ if ! ota_from_target_files -k ~/.android-certs/releasekey \
     exit 1
 fi
 
-# Extract the signed system image from the OTA package
+# Extract the signed system image from the signed target files package
 echo "Extracting signed system image..."
 cd ~/MP01-LineageGSI
 
-# First, let's see what's actually in the OTA package
-echo "Contents of OTA package:"
-unzip -l "../los22/signed-ota-update-${build_date}.zip"
-
-# Try to extract system.img, but handle different possible names
-if unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d . 2>/dev/null; then
-    echo "Successfully extracted system.img"
-elif unzip -j "../los22/signed-ota-update-${build_date}.zip" "*system*.img" -d . 2>/dev/null; then
-    echo "Successfully extracted system image with wildcard"
-    # Find the extracted system image file
-    system_img_file=$(find . -name "*system*.img" -type f | head -1)
-    if [[ -n "$system_img_file" ]]; then
-        mv "$system_img_file" "$image_filename"
-    else
-        echo "Error: Could not find extracted system image file"
-        exit 1
-    fi
+# Extract system.img from the signed target files package
+if unzip -j "../los22/signed-target-files-${build_date}.zip" "IMAGES/system.img" -d . 2>/dev/null; then
+    echo "Successfully extracted system.img from signed target files"
+    mv system.img "$image_filename"
 else
-    echo "Error: Could not extract system image from OTA package"
-    echo "Available files in OTA package:"
-    unzip -l "../los22/signed-ota-update-${build_date}.zip"
+    echo "Error: Could not extract system.img from signed target files package"
+    echo "Available files in signed target files package:"
+    unzip -l "../los22/signed-target-files-${build_date}.zip"
     exit 1
 fi
 
@@ -149,10 +139,6 @@ echo "Updating OTA file, committing, and pushing to repo..."
 cd ~/MP01-LineageGSI
 git pull # pull latest changes - fixes issue being unable to commit ota.json 
 
-# Get current date in human readable format
-current_date=$(date '+%Y-%m-%d')
-# Get current timestamp
-current_timestamp=$(date +%s)
 # Get the size of the tar.gz file in bytes
 tar_size=$(stat -c%s "$tar_filename")
 
@@ -160,7 +146,7 @@ tar_size=$(stat -c%s "$tar_filename")
 cat > ota.json << EOF
 {
     "version": "${current_date} (LineageOS 22.2)",
-    "date": "${current_timestamp}",
+    "date": "${build_date}",
     "variants": [
         {
             "name": "treble_arm64_bvN-userdebug",
