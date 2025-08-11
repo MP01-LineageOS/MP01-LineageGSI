@@ -18,5 +18,5 @@
 
 device.internal = 1
 keyboard.builtIn = 1
-keyboard.layout = aw9523b-key
+keyboard.layout = aw9523b-key.kl
 keyboard.characterMap = aw9523b-key
