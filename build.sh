@@ -1,20 +1,12 @@
 #!/bin/bash
 
-# Parse command line arguments
-UNSIGNED=false
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --unsigned)
-            UNSIGNED=true
-            shift
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [--unsigned]"
-            exit 1
-            ;;
-    esac
-done
+# Check if android-certs directory exists
+if [[ ! -d ~/.android-certs ]]; then
+    echo "Error: ~/.android-certs directory not found!"
+    echo "Please ensure you have set up your Android signing keys in ~/.android-certs"
+    echo "This directory should contain your releasekey and other signing certificates."
+    exit 1
+fi
 
 export USE_CCACHE=1
 export CCACHE_DIR=~/.cache/ccache
@@ -75,7 +67,7 @@ if ! lunch treble_arm64_bvN-bp1a-userdebug; then
 fi
 
 # Build both system image and target files package
-if ! make systemimage target-files-package otatools -j$(nproc --all); then
+if ! make target-files-package otatools -j$(nproc --all); then
   exit 1
 fi
 
@@ -83,60 +75,46 @@ build_date=$(date +%s)
 echo "Packing and signing system image... build_date is ${build_date}"
 cd ~/MP01-LineageGSI
 
-# Determine signing status and filename
-if [[ "$UNSIGNED" == true ]]; then
-    echo "Building unsigned build (test-keys)"
-    tar_filename="MP01-Lineage-${build_date}-test-keys.tar.gz"
-    image_filename="MP01-Lineage-${build_date}-test-keys.img"
-    signing_status="test-keys"
-    
-    # For unsigned builds, just copy the system image directly
-    cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "$image_filename"
-else
-    echo "Building signed build (release-keys)"
-    tar_filename="MP01-Lineage-${build_date}-signed.tar.gz"
-    image_filename="MP01-Lineage-${build_date}-signed.img"
-    signing_status="signed"
-    
-    # For signed builds, use the signing process
-    echo "Signing target files package..."
-    cd ../los22
-    
-    # Sign the target files package using sign.sh script
-    if ! bash ~/MP01-LineageGSI/sign.sh "signed-target-files-${build_date}.zip"; then
-        echo "Signing failed!"
-        exit 1
-    fi
-    
-    # Generate the signed OTA package
-    echo "Generating signed OTA package..."
-    if ! ota_from_target_files -k ~/.android-certs/releasekey \
-        --block --backup=true \
-        "signed-target-files-${build_date}.zip" \
-        "signed-ota-update-${build_date}.zip"; then
-        echo "OTA generation failed!"
-        exit 1
-    fi
-    
-    # Extract the signed system image from the OTA package
-    echo "Extracting signed system image..."
-    cd ~/MP01-LineageGSI
-    unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d .
-    mv system.img "$image_filename"
-    
-    # Clean up intermediate files
-    rm -f "../los22/signed-target-files-${build_date}.zip"
-    rm -f "../los22/signed-ota-update-${build_date}.zip"
+echo "Building signed build (release-keys)"
+tar_filename="MP01-Lineage-${build_date}-signed.tar.gz"
+image_filename="MP01-Lineage-${build_date}-signed.img"
+
+# For signed builds, use the signing process
+echo "Signing target files package..."
+cd ../los22
+
+# Sign the target files package using sign.sh script
+if ! bash ~/MP01-LineageGSI/sign.sh "signed-target-files-${build_date}.zip"; then
+    echo "Signing failed!"
+    exit 1
 fi
+
+# Generate the signed OTA package
+echo "Generating signed OTA package..."
+if ! ota_from_target_files -k ~/.android-certs/releasekey \
+    --block --backup=true \
+    "signed-target-files-${build_date}.zip" \
+    "signed-ota-update-${build_date}.zip"; then
+    echo "OTA generation failed!"
+    exit 1
+fi
+
+# Extract the signed system image from the OTA package
+echo "Extracting signed system image..."
+cd ~/MP01-LineageGSI
+unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d .
+mv system.img "$image_filename"
+
+# Clean up intermediate files
+rm -f "../los22/signed-target-files-${build_date}.zip"
+rm -f "../los22/signed-ota-update-${build_date}.zip"
 
 # Create tar.gz with the image file
 tar -czvf "$tar_filename" "$image_filename"
 
-# Only upload to GitHub releases if building signed
-if [[ "$UNSIGNED" != true ]]; then
-    gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
-    gh release upload "${build_date}" "$tar_filename"
-fi
+# Upload to GitHub releases
+gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
+gh release upload "${build_date}" "$tar_filename"
 
 # Update OTA file, commit, and push to repo
 echo "Updating OTA file, committing, and pushing to repo..."
@@ -150,10 +128,8 @@ current_timestamp=$(date +%s)
 # Get the size of the tar.gz file in bytes
 tar_size=$(stat -c%s "$tar_filename")
 
-# Only update ota.json if build is signed
-if [[ "$UNSIGNED" != true ]]; then
-  # Update ota.json with new build information
-  cat > ota.json << EOF
+# Update ota.json with new build information
+cat > ota.json << EOF
 {
     "version": "${current_date} (LineageOS 22.2)",
     "date": "${current_timestamp}",
@@ -167,12 +143,11 @@ if [[ "$UNSIGNED" != true ]]; then
 }
 EOF
 
-  # Commit and push the updated ota.json
-  git add ota.json
-  git commit -m "Update OTA.json for build ${build_date} (${current_date})"
-  git push
-fi
+# Commit and push the updated ota.json
+git add ota.json
+git commit -m "Update OTA.json for build ${build_date} (${current_date})"
+git push
 
 echo "Build completed successfully!"
 echo "Output file: $tar_filename"
-echo "Signing status: $signing_status"
+echo "Signing status: signed"
