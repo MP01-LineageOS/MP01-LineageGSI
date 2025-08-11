@@ -17,6 +17,8 @@ PRODUCT_CHARACTERISTICS := device
 # include inkOS launcher
 PRODUCT_PACKAGES += \
     inkos
+    finqwerty
+    mtk_r_ims
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
 
@@ -24,6 +26,9 @@ PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
 #PRODUCT_PROPERTY_OVERRIDES += \
 #    ro.launcher.home=app.inkos
 # this seems to break things??
+
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+	ro.system.ota.json_url=https://raw.githubusercontent.com/phhusson/treble_experimentations/master/ota/squeak/ota.json
 
 LINEAGE_BUILDTYPE := VANILLA
 LINEAGE_EXTRAVERSION := -EXT4
