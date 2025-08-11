@@ -1,6 +1,0 @@
-android_app_import {
-    name: "mtk_r_ims",
-    apk: "ims-mtk-r-resigned.apk",
-    presigned: true,
-    preprocessed: true,
-}
