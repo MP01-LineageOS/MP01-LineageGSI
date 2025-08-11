@@ -69,3 +69,29 @@ tar -czvf "system-${build_date}.tar.gz" ./system.img
 
 gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
 gh release upload "${build_date}" "system-${build_date}.tar.gz"
+
+# Update OTA file and commit to repo
+echo "Updating OTA file and committing to repo..."
+cd ~/MP01-LineageGSI
+
+# Get current date in human readable format
+current_date=$(date '+%Y-%m-%d')
+# Get current timestamp
+current_timestamp=$(date +%s)
+# Get the size of the tar.gz file in bytes
+tar_size=$(stat -c%s "system-${build_date}.tar.gz")
+
+# Update ota.json with new build information
+cat > ota.json << EOF
+{
+    "version": "${current_date} (LineageOS 22.2)",
+    "date": "${current_timestamp}",
+    "variants": [
+        {
+            "name": "treble_arm64_bvN-userdebug",
+            "size": "${tar_size}",
+            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/${build_date}/system-${build_date}.tar.gz"
+        }
+    ]
+}
+EOF
