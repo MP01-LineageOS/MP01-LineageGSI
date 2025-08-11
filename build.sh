@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Parse command line arguments
+UNSIGNED=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --unsigned)
+            UNSIGNED=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--unsigned]"
+            exit 1
+            ;;
+    esac
+done
+
 export USE_CCACHE=1
 export CCACHE_DIR=~/.cache/ccache
 export CCACHE_EXEC=$(which ccache)
@@ -64,11 +80,31 @@ fi
 build_date=$(date +%s)
 echo "Packing system image... build_date is ${build_date}"
 cd ~/MP01-LineageGSI
-cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "system.img"
-tar -czvf "system-${build_date}.tar.gz" ./system.img
 
-gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
-gh release upload "${build_date}" "system-${build_date}.tar.gz"
+# Determine signing status and filename
+if [[ "$UNSIGNED" == true ]]; then
+    echo "Building unsigned build (test-keys)"
+    tar_filename="MP01-Lineage-${build_date}-test-keys.tar.gz"
+    image_filename="MP01-Lineage-${build_date}-test-keys.img"
+    signing_status="test-keys"
+else
+    echo "Building signed build (release-keys)"
+    tar_filename="MP01-Lineage-${build_date}-signed.tar.gz"
+    image_filename="MP01-Lineage-${build_date}-signed.img"
+    signing_status="signed"
+fi
+
+# Copy and rename the system image
+cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "$image_filename"
+
+# Create tar.gz with the renamed image file
+tar -czvf "$tar_filename" "$image_filename"
+
+# Only upload to GitHub releases if building signed
+if [[ "$UNSIGNED" != true ]]; then
+    gh release create "${build_date}" --title "system-${build_date}" --notes "System Image for MP01" -d
+    gh release upload "${build_date}" "$tar_filename"
+fi
 
 # Update OTA file and commit to repo
 echo "Updating OTA file and committing to repo..."
@@ -79,10 +115,12 @@ current_date=$(date '+%Y-%m-%d')
 # Get current timestamp
 current_timestamp=$(date +%s)
 # Get the size of the tar.gz file in bytes
-tar_size=$(stat -c%s "system-${build_date}.tar.gz")
+tar_size=$(stat -c%s "$tar_filename")
 
-# Update ota.json with new build information
-cat > ota.json << EOF
+# Only update ota.json if build is signed
+if [[ "$UNSIGNED" != true ]]; then
+  # Update ota.json with new build information
+  cat > ota.json << EOF
 {
     "version": "${current_date} (LineageOS 22.2)",
     "date": "${current_timestamp}",
@@ -90,8 +128,13 @@ cat > ota.json << EOF
         {
             "name": "treble_arm64_bvN-userdebug",
             "size": "${tar_size}",
-            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/${build_date}/system-${build_date}.tar.gz"
+            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/${build_date}/${tar_filename}"
         }
     ]
 }
 EOF
+fi
+
+echo "Build completed successfully!"
+echo "Output file: $tar_filename"
+echo "Signing status: $signing_status"
