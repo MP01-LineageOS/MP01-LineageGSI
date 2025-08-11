@@ -13,6 +13,7 @@ For known issues, bug reports, and future features see the project [issues](http
 3. Out of the box, the keyboard layout isn't fully functional, to fix this, open `FinQwerty` > `Physical Keyboard Settings` and change the layout to `QWERTY English Layout for Minimal Phone MP01`.
 4. No launcher is set as the default. You can fix this when you open inkOS, it'll prompt you to set the default launcher.
 5. The dark theme is still the default, this is horrible on e-Ink, switch to Light during setup.
+6. The e-Ink panel auto switching can be a little finnicky, you can disable this by double clicking the refresh button, pressing the cog, and enabling `Disable Per-App Refreh Mode`.
 
 ### Build Script (Testing)
 ```bash
