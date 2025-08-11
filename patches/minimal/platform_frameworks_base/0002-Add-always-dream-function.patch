@@ -44,7 +44,7 @@ index dc40304ba24a..b7afeac2539a 100644
      @WhenToDream
      public int getWhenToDreamSetting() {
 +        // Check if ALWAYS is set first
-+        if (getBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, 0)) {
++        if (getBoolean(Settings.Secure.SCREENSAVER_ACTIVATE_ALWAYS, false)) {
 +            return ALWAYS;
 +        }
          return isActivatedOnDock() && isActivatedOnSleep() ? EITHER
