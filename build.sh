@@ -109,6 +109,7 @@ fi
 # Update OTA file, commit, and push to repo
 echo "Updating OTA file, committing, and pushing to repo..."
 cd ~/MP01-LineageGSI
+git pull # pull latest changes - fixes issue being unable to commit ota.json 
 
 # Get current date in human readable format
 current_date=$(date '+%Y-%m-%d')
