@@ -102,12 +102,40 @@ fi
 # Extract the signed system image from the OTA package
 echo "Extracting signed system image..."
 cd ~/MP01-LineageGSI
-unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d .
-mv system.img "$image_filename"
+
+# First, let's see what's actually in the OTA package
+echo "Contents of OTA package:"
+unzip -l "../los22/signed-ota-update-${build_date}.zip"
+
+# Try to extract system.img, but handle different possible names
+if unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d . 2>/dev/null; then
+    echo "Successfully extracted system.img"
+elif unzip -j "../los22/signed-ota-update-${build_date}.zip" "*system*.img" -d . 2>/dev/null; then
+    echo "Successfully extracted system image with wildcard"
+    # Find the extracted system image file
+    system_img_file=$(find . -name "*system*.img" -type f | head -1)
+    if [[ -n "$system_img_file" ]]; then
+        mv "$system_img_file" "$image_filename"
+    else
+        echo "Error: Could not find extracted system image file"
+        exit 1
+    fi
+else
+    echo "Error: Could not extract system image from OTA package"
+    echo "Available files in OTA package:"
+    unzip -l "../los22/signed-ota-update-${build_date}.zip"
+    exit 1
+fi
+
+# Verify the image file exists before proceeding
+if [[ ! -f "$image_filename" ]]; then
+    echo "Error: System image file not found: $image_filename"
+    exit 1
+fi
 
 # Clean up intermediate files
-rm -f "../los22/signed-target-files-${build_date}.zip"
-rm -f "../los22/signed-ota-update-${build_date}.zip"
+# rm -f "../los22/signed-target-files-${build_date}.zip"
+# rm -f "../los22/signed-ota-update-${build_date}.zip"
 
 # Create tar.gz with the image file
 tar -czvf "$tar_filename" "$image_filename"
