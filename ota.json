@@ -1,11 +1,11 @@
 {
-    "version": "2025-08-12 (LineageOS 22.2)",
-    "date": "1723708800",
+    "version": "2025-08-11 (LineageOS 22.2)",
+    "date": "1754927718",
     "variants": [
         {
             "name": "treble_arm64_bvN-userdebug",
-            "size": "1",
-            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/1754909763/system-1754909763.tar.gz"
+            "size": "1206084657",
+            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/1754927560/system-1754927560.tar.gz"
         }
     ]
 }
