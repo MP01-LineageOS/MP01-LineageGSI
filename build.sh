@@ -41,15 +41,15 @@ rm -rf ~/los22/MP01Support # Cleanup before build to prevent build errors
 finqwerty_apk="finqwerty-release.apk" # this will always stay the same
 
 # Fetch latest release JSON and extract download URL for the asset
-download_url=$(curl -s https://api.github.com/repos/MP01Experiments/finqwerty/releases/latest \
+finqwerty_download_url=$(curl -s https://api.github.com/repos/MP01Experiments/finqwerty/releases/latest \
   | jq -r --arg NAME "$finqwerty_apk" '.assets[] | select(.name == $NAME) | .browser_download_url')
 
-if [[ -z "$browser_download_url" ]]; then
+if [[ -z "$finqwerty_download_url" || "$finqwerty_download_url" == "null" ]]; then
   echo "Asset $finqwerty_apk not found in latest release." >&2
   exit 1
 fi
 
-curl -L -o ~/los22/vendor/finqwerty/finqwerty-release.apk "$download_url" # Download latest release and dump in vendor/finqwerty
+curl -L -o ~/los22/vendor/finqwerty/finqwerty-release.apk "$finqwerty_download_url" # Download latest release and dump in vendor/finqwerty
 
 # Do tha thing
 source ~/los22/build/envsetup.sh
