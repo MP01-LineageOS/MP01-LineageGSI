@@ -16,8 +16,8 @@ PRODUCT_CHARACTERISTICS := device
 
 # include inkOS launcher
 PRODUCT_PACKAGES += \
-    inkos
-    finqwerty
+    inkos \
+    finqwerty \
     mtk_r_ims
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
