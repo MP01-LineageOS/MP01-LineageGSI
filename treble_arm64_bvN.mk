@@ -28,7 +28,7 @@ PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
 # this seems to break things??
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-	ro.system.ota.json_url=https://raw.githubusercontent.com/phhusson/treble_experimentations/master/ota/squeak/ota.json
+	ro.system.ota.json_url=https://raw.githubusercontent.com/MP01Experiments/MP01-LineageGSI/master/ota.json
 
 LINEAGE_BUILDTYPE := VANILLA
 LINEAGE_EXTRAVERSION := -EXT4
