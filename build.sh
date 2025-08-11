@@ -42,7 +42,7 @@ cd ~/los22
 rm ~/los22/device/phh/treble/treble_arm64* # remove old makefiles
 cp ~/los22/MP01Support/treble_arm64* ~/los22/device/phh/treble/ # copy new makefiles
 cp -r ~/los22/MP01Support/vendor ~/los22/ # copy vendor
-cp -r ~/los22/MP01Support/vendor/inkOS ~/los22/vendor/ # copy inkOS - TODO: Replace with our own built version like finqwerty
+cp -r ~/los22/MP01Support/vendor/inkos ~/los22/vendor/ # copy inkOS - TODO: Replace with our own built version like finqwerty
 cp -r ~/los22/MP01Support/vendor/finqwerty ~/los22/vendor/ # create finqwerty folder with Android.bp in it
 rm -rf ~/los22/MP01Support # Cleanup before build to prevent build errors
 
