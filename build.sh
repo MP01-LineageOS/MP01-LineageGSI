@@ -73,12 +73,14 @@ source ~/los22/build/envsetup.sh
 if ! lunch treble_arm64_bvN-bp1a-userdebug; then
   exit 1
 fi
-if ! make systemimage -j$(nproc --all); then
+
+# Build both system image and target files package
+if ! make systemimage target-files-package otatools -j$(nproc --all); then
   exit 1
 fi
 
 build_date=$(date +%s)
-echo "Packing system image... build_date is ${build_date}"
+echo "Packing and signing system image... build_date is ${build_date}"
 cd ~/MP01-LineageGSI
 
 # Determine signing status and filename
@@ -87,17 +89,47 @@ if [[ "$UNSIGNED" == true ]]; then
     tar_filename="MP01-Lineage-${build_date}-test-keys.tar.gz"
     image_filename="MP01-Lineage-${build_date}-test-keys.img"
     signing_status="test-keys"
+    
+    # For unsigned builds, just copy the system image directly
+    cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "$image_filename"
 else
     echo "Building signed build (release-keys)"
     tar_filename="MP01-Lineage-${build_date}-signed.tar.gz"
     image_filename="MP01-Lineage-${build_date}-signed.img"
     signing_status="signed"
+    
+    # For signed builds, use the signing process
+    echo "Signing target files package..."
+    cd ../los22
+    
+    # Sign the target files package using sign.sh script
+    if ! bash ~/MP01-LineageGSI/sign.sh "signed-target-files-${build_date}.zip"; then
+        echo "Signing failed!"
+        exit 1
+    fi
+    
+    # Generate the signed OTA package
+    echo "Generating signed OTA package..."
+    if ! ota_from_target_files -k ~/.android-certs/releasekey \
+        --block --backup=true \
+        "signed-target-files-${build_date}.zip" \
+        "signed-ota-update-${build_date}.zip"; then
+        echo "OTA generation failed!"
+        exit 1
+    fi
+    
+    # Extract the signed system image from the OTA package
+    echo "Extracting signed system image..."
+    cd ~/MP01-LineageGSI
+    unzip -j "../los22/signed-ota-update-${build_date}.zip" "system.img" -d .
+    mv system.img "$image_filename"
+    
+    # Clean up intermediate files
+    rm -f "../los22/signed-target-files-${build_date}.zip"
+    rm -f "../los22/signed-ota-update-${build_date}.zip"
 fi
 
-# Copy and rename the system image
-cp ../los22/out/target/product/tdgsi_arm64_ab/system.img "$image_filename"
-
-# Create tar.gz with the renamed image file
+# Create tar.gz with the image file
 tar -czvf "$tar_filename" "$image_filename"
 
 # Only upload to GitHub releases if building signed
