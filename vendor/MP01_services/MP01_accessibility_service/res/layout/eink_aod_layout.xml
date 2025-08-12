@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF"> <!-- White background for E-Ink -->
+
+    <TextView
+        android:id="@+id/eink_aod_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="E-Ink AOD"
+        android:textColor="#FF000000" <!-- Black text -->
+        android:textSize="24sp" />
+
+</FrameLayout>

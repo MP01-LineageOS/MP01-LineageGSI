@@ -103,6 +103,39 @@
             app:defaultValue="2000"
             app:dialogTitle="Choose Max Brightness" />
 
+        <SwitchPreferenceCompat
+            app:key="enable_eink_aod_on_lock"
+            app:title="Enable E-Ink AOD &amp; Fade on Lock"
+            app:summary="Show overlay and fade brightness when screen locks"
+            app:defaultValue="false" />
+
+        <SeekBarPreference
+            app:key="fade_off_duration_ms"
+            app:title="Fade Off Duration"
+            app:summary="Duration for brightness fade-out on lock (300-1500ms)"
+            app:defaultValue="500"
+            android:min="300"
+            android:max="1500"
+            app:showSeekBarValue="true"/>
+
+        <SeekBarPreference
+            app:key="fade_on_duration_ms"
+            app:title="Fade On Duration (Future)"
+            app:summary="Duration for brightness fade-in on unlock (300-1500ms). Not yet active."
+            app:defaultValue="500"
+            android:min="300"
+            android:max="1500"
+            app:showSeekBarValue="true"/>
+
+        <SeekBarPreference
+            app:key="fade_interval_ms"
+            app:title="Fade Step Interval"
+            app:summary="Time between fade steps (30-100ms)"
+            app:defaultValue="50"
+            android:min="30"
+            android:max="100"
+            app:showSeekBarValue="true"/>
+
     </PreferenceCategory>
     <PreferenceCategory app:title="Refresh Mode Settings">
         <SwitchPreferenceCompat
