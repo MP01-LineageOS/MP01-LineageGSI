@@ -3,7 +3,7 @@
     "date": "1755010528",
     "variants": [
         {
-            "name": "treble_arm64_bvN-userdebug",
+            "name": "treble_arm64_bvN",
             "size": "1204312876",
             "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/1755010528/MP01-Lineage-1755010528-signed.tar.gz"
         }

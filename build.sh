@@ -158,7 +158,7 @@ cat > ota.json << EOF
     "date": "${build_date}",
     "variants": [
         {
-            "name": "treble_arm64_bvN-userdebug",
+            "name": "treble_arm64_bvN",
             "size": "${tar_size}",
             "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/${build_date}/${tar_filename}"
         }
