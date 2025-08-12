@@ -1,11 +1,11 @@
 {
     "version": "2025-08-12 (LineageOS 22.2)",
-    "date": "1754989941",
+    "date": "1755010528",
     "variants": [
         {
             "name": "treble_arm64_bvN-userdebug",
-            "size": "1204287794",
-            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/1754989941/MP01-Lineage-1754989941-signed.tar.gz"
+            "size": "1204312876",
+            "url": "https://github.com/MP01Experiments/MP01-LineageGSI/releases/download/1755010528/MP01-Lineage-1755010528-signed.tar.gz"
         }
     ]
 }
