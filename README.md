@@ -6,6 +6,10 @@ For known issues, bug reports, and future features see the project [issues](http
 ### Display Notes
 > Currently I'm testing using v25 of the screen firmware, I'll include a way to migrate between builds at some point. I'll also provide a side-by-side so you can pick which version suits you the best.
 
+### Resources
+- [Dumbphone Hangout Discord](https://discord.gg/Emt3jwUMg9) - I'll be posting updates in the #mp01-lineage-updates channel
+- [Minimal Phone MP01 Unlock & Flashing Guide](https://chardidath.ing/posts/mp01-flashing-guide/)
+
 ### Current Workarounds
 1. Presets aren't setup OOB, go to Settings > PHH Settings > My device > Apply presets
 2. IMS isn't setup OOB, go to Settings > PHH Settings > IMS features > and tap on `Create IMS APN` and `Install IMS APK for MediaTek R+ vendor` Reboot when you see `You may reboot!`
