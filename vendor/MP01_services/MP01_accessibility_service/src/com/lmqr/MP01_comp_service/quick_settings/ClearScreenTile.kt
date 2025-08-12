@@ -24,6 +24,6 @@ class ClearScreenTile: TileService() {
     }
 
     override fun onClick() {
-        PreferenceManager.getDefaultSharedPreferences(this).toggle("run_clear_screen")
+        // PreferenceManager.getDefaultSharedPreferences(this).toggle("run_clear_screen")
     }
 }

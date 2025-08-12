@@ -580,19 +580,19 @@ class MP01AccessibilityService : AccessibilityService(),
                 "color_scheme_type", "color_scheme_color" -> {
                     updateColorScheme(pref)
                 }
-                "close_status_bar" -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
-                    }
-                }
-                "run_clear_screen" -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
-                        handler.postDelayed({
-                            commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
-                        }, 700)
-                    }
-                }
+                //"close_status_bar" -> {
+                //    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                //        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+                //    }
+                //}
+                //"run_clear_screen" -> {
+                //    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                //        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+                //        handler.postDelayed({
+                //            commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
+                //        }, 700)
+                //    }
+                //}
                 "show_eink_menu", "show_eink_menu_top" -> {
                     Log.d("MP01Service", "Eink menu preference changed: $key")
                 }

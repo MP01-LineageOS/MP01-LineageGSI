@@ -32,6 +32,6 @@ class LaunchSettingsTile : TileService() {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
 
-        PreferenceManager.getDefaultSharedPreferences(this).toggle("close_status_bar")
+        // PreferenceManager.getDefaultSharedPreferences(this).toggle("close_status_bar")
     }
 }
