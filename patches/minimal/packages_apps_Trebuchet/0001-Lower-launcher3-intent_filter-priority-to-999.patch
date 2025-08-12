@@ -1,0 +1,26 @@
+From d3ab9cc7084efd2158a9dacda4694a792783bf6a Mon Sep 17 00:00:00 2001
+From: Charlie Mizutsuki <charlie.mizutsuki@posteo.net>
+Date: Tue, 12 Aug 2025 14:13:07 +0000
+Subject: [PATCH] Lower launcher3 intent_filter priority to -999
+
+Change-Id: I3b7285b5d5b11f9663d4187e9d8ecd1b0b1e8a07
+---
+ AndroidManifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index c1473456a3..e699c93bca 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -59,7 +59,7 @@
+             android:taskAffinity=""
+             android:exported="true"
+             android:enabled="true">
+-            <intent-filter>
++            <intent-filter android:priority="-999">
+                 <action android:name="android.intent.action.MAIN" />
+                 <action android:name="android.intent.action.SHOW_WORK_APPS" />
+                 <category android:name="android.intent.category.HOME" />
+-- 
+2.43.0
+
