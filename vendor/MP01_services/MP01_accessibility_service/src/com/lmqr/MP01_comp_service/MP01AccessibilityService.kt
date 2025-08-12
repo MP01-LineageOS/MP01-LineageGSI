@@ -58,7 +58,7 @@ class MP01AccessibilityService : AccessibilityService(),
                     if (sharedPreferences.getBoolean("refresh_on_lock", false))
                         handler.postDelayed({
                             commandRunner.runCommands(arrayOf(Commands.SPEED_CLEAR))
-                        }, 150)
+                        }, 50)
                     brightnessManager.turnOffBrightness()
                 }
                 Intent.ACTION_SCREEN_ON -> {
@@ -80,9 +80,9 @@ class MP01AccessibilityService : AccessibilityService(),
                     commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
                 }
 
-                "EINK_REFRESH_SPEED_CLEAR" -> {
-                    refreshModeManager.changeMode(RefreshMode.CLEAR)
-                }
+                //"EINK_REFRESH_SPEED_CLEAR" -> {
+                //    refreshModeManager.changeMode(RefreshMode.CLEAR)
+                //}
 
                 "EINK_REFRESH_SPEED_BALANCED" -> {
                     refreshModeManager.changeMode(RefreshMode.BALANCED)
@@ -121,7 +121,7 @@ class MP01AccessibilityService : AccessibilityService(),
 
         val filterEink = IntentFilter()
         filterEink.addAction("EINK_FORCE_CLEAR")
-        filterEink.addAction("EINK_REFRESH_SPEED_CLEAR")
+        //filterEink.addAction("EINK_REFRESH_SPEED_CLEAR")
         filterEink.addAction("EINK_REFRESH_SPEED_BALANCED")
         filterEink.addAction("EINK_REFRESH_SPEED_SMOOTH")
         filterEink.addAction("EINK_REFRESH_SPEED_FAST")
@@ -268,10 +268,10 @@ class MP01AccessibilityService : AccessibilityService(),
                         false
                     }
 
-                    button1.setOnClickListener {
-                        refreshModeManager.changeMode(RefreshMode.CLEAR)
-                        updateButtons(refreshModeManager.currentMode)
-                    }
+                    //button1.setOnClickListener {
+                    //    refreshModeManager.changeMode(RefreshMode.CLEAR)
+                    //    updateButtons(refreshModeManager.currentMode)
+                    //}
                     button2.setOnClickListener {
                         refreshModeManager.changeMode(RefreshMode.BALANCED)
                         updateButtons(refreshModeManager.currentMode)

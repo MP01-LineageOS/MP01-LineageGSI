@@ -5,7 +5,8 @@ import com.lmqr.hMP01_comp_service.command_runners.CommandRunner
 import com.lmqr.hMP01_comp_service.command_runners.Commands
 
 enum class RefreshMode(val command: String, val mode: Int) {
-    CLEAR(Commands.SPEED_CLEAR, 0),
+    // Disable Clear Mode
+    // CLEAR(Commands.SPEED_CLEAR, 0),
     BALANCED(Commands.SPEED_BALANCED, 1),
     SMOOTH(Commands.SPEED_SMOOTH, 2),
     SPEED(Commands.SPEED_FAST, 3);

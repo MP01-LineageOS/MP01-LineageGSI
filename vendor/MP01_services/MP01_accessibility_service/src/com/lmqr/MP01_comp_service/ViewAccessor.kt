@@ -16,7 +16,8 @@ import androidx.core.content.ContextCompat
  * and provides direct access to the views in the layout.
  */
 class FloatingMenuViewAccessor(val root: View) {
-    val button1: Button = root.findViewById(R.id.button1)
+    // Disable "clear" mode
+    // val button1: Button = root.findViewById(R.id.button1)
     val button2: Button = root.findViewById(R.id.button2)
     val button3: Button = root.findViewById(R.id.button3)
     val button4: Button = root.findViewById(R.id.button4)
@@ -39,12 +40,13 @@ fun FloatingMenuViewAccessor?.close() = this?.run {
 }
 
 fun FloatingMenuViewAccessor?.updateButtons(mode: RefreshMode) = this?.run {
-    listOf(button1, button2, button3, button4).forEach { 
+    listOf(button2, button3, button4).forEach {
         it.deselect()
     }
     
     when (mode) {
-        RefreshMode.CLEAR -> button1.select()
+        // Disable Clear mode
+        // RefreshMode.CLEAR -> button1.select()
         RefreshMode.BALANCED -> button2.select()
         RefreshMode.SMOOTH -> button3.select()
         RefreshMode.SPEED -> button4.select()
