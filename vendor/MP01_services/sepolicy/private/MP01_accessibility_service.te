@@ -3,6 +3,9 @@
 type MP01_accessibility_service, domain;
 app_domain(MP01_accessibility_service)
 
+# Mark as system app to inherit system privileges
+typeattribute MP01_accessibility_service system_app;
+
 # Allow accessibility service to access system services
 allow MP01_accessibility_service app_api_service:service_manager find;
 allow MP01_accessibility_service accessibility_service:service_manager find;
@@ -16,3 +19,10 @@ set_prop(MP01_accessibility_service, system_prop)
 
 # Access to overlay display
 allow MP01_accessibility_service surfaceflinger_service:service_manager find;
+
+# CRITICAL: Allow writing to secure settings
+allow MP01_accessibility_service settings_prop:property_service set;
+allow MP01_accessibility_service system_server:service_manager find;
+
+# Allow writing to settings database
+allow MP01_accessibility_service settings_database:file { read write };

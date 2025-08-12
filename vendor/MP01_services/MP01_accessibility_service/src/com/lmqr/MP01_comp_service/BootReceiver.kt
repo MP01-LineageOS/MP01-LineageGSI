@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemProperties
 import android.provider.Settings
+import android.util.Log
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d("MP01BootReceiver", "Boot receiver triggered with action: ${intent.action}")
         // Get the intended service from system property
         val propertyValue = SystemProperties.get(
             "persist.accessibility.enabled_service", "")
@@ -30,10 +32,15 @@ class BootReceiver : BroadcastReceiver() {
             }
             enabledServices += serviceName
             
-            Settings.Secure.putString(
-                context.contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-                enabledServices)
+            try {
+                Settings.Secure.putString(
+                    context.contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                    enabledServices)
+                Log.d("MP01BootReceiver", "Successfully enabled accessibility service")
+            } catch (e: Exception) {
+                Log.e("MP01BootReceiver", "Failed to enable accessibility service", e)
+            }
                 
             Settings.Secure.putInt(
                 context.contentResolver,
