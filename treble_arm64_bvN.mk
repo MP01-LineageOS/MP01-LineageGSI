@@ -17,7 +17,8 @@ PRODUCT_CHARACTERISTICS := device
 # include inkOS launcher
 PRODUCT_PACKAGES += \
     inkos \
-    finqwerty
+    finqwerty \
+    F-DroidPrivilegedExtension
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
 
