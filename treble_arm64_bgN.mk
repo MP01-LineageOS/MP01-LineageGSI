@@ -22,6 +22,7 @@ PRODUCT_PACKAGES += \
     F-DroidPrivilegedExtension
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
+WITH_ADB_INSECURE := true
 
 # inkOS is set as the default launcher - idk if this is right
 #PRODUCT_PROPERTY_OVERRIDES += \
