@@ -1,7 +1,7 @@
 ## LineageOS 22.2 GSI for Minimal Phone (MP01)
 You'll need to get familiar with [Git and Repo](https://source.android.com/source/using-repo.html) as well as [TrebleDroid Wiki](https://github.com/TrebleDroid/treble_experimentations/wiki).
 
-For known issues, bug reports, and future features see the project [issues](https://github.com/chardidathing/MP01-LineageGSI/issues)
+For known issues, bug reports, and future features see the project [issues](https://github.com/MP01-LineageOS/MP01-OS/issues).
 
 ### Display Notes
 > Currently I'm testing using v25 of the screen firmware, I'll include a way to migrate between builds at some point. I'll also provide a side-by-side so you can pick which version suits you the best.
@@ -21,7 +21,21 @@ For known issues, bug reports, and future features see the project [issues](http
 
 ### Build Script (Testing)
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/refs/heads/15/build.sh)
+git clone https://github.com/MP01-LineageOS/MP01-LineageGSI.git -b 15
+cd MP01-LineageGSI
+bash scripts/verify-release-inputs.sh
+bash build.sh
+```
+
+### Release Inputs
+Downloaded release inputs are pinned in `scripts/release-inputs.sh`. Update the
+URL, version, and SHA256 together when intentionally moving to a new FinQwerty,
+F-Droid, repo-launcher, or baseline release artifact.
+
+Verify the pinned APK inputs without a full Android checkout:
+
+```bash
+bash scripts/verify-release-inputs.sh
 ```
 <details>
     <summary>Manual Build Instructions (Incomplete)</summary>
@@ -45,7 +59,7 @@ bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/r
 
     ### Clone the Manifest to add necessary dependencies for gsi:
     
-        git clone https://github.com/MisterZtr/treble_manifest.git .repo/local_manifests  -b 15-los-qpr2
+        git clone https://github.com/MP01-LineageOS/treble_manifest.git .repo/local_manifests -b 15-los-qpr2
     
 
 
@@ -73,7 +87,8 @@ bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/r
     bash generate.sh lineage
     ```
     
-    Also, copy the files treble_arm64_bgN.mk and treble_arm64_bvN.mk to this folder
+    Also, copy `AndroidProducts.mk` and the files `treble_arm64_bgN.mk`,
+    `treble_arm64_bmN.mk`, and `treble_arm64_bvN.mk` to this folder.
 
 
     ### Turn on caching to speed up build
@@ -103,6 +118,30 @@ bash <(curl -s https://raw.githubusercontent.com/chardidathing/MP01-LineageGSI/r
     . build/envsetup.sh
     ccache -M 50G -F 0
     lunch treble_arm64_bgN-bp1a-userdebug
+    make systemimage -j$(nproc --all)
+    ```
+
+    For the staged microG version, sync the `microg` manifest group and remove
+    proprietary `vendor/gapps` plus the standalone F-Droid privileged extension
+    from that build graph. The local-only helper script does this and does not
+    publish releases, edit OTA metadata, commit, or push:
+
+    ```
+    bash buildmicrog.sh
+    ```
+
+    The script writes Android source/build state and ccache to
+    `../.android-build`, and writes the image plus `.tar.gz` archive to
+    `../images` by default. Override with `MP01_WORKSPACE_BUILD_DIR`,
+    `MP01_BUILD_ROOT`, `MP01_CCACHE_DIR`, or `MP01_IMAGE_DIR` if needed.
+
+    Manual microG lunch target:
+
+    ```
+    . build/envsetup.sh
+    ccache -M 50G -F 0
+    bash vendor/partner_gms/vendorsetup.sh
+    lunch treble_arm64_bmN-bp1a-userdebug
     make systemimage -j$(nproc --all)
     ```
 
