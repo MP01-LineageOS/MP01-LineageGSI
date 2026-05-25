@@ -54,6 +54,21 @@ codex_check_free_space_gib "$workspace_build_dir" "$min_free_gb"
 mp01_ensure_repo_launcher "$build_root/.bin"
 cd "$build_root"
 
+# Android checkouts create nested git repos after the container launcher has
+# already built its safe.directory list.
+android_build_safe_directory="$build_root/*"
+if ! git config --global --get-all safe.directory | grep -Fx -- "$android_build_safe_directory" >/dev/null; then
+    git config --global --add safe.directory "$android_build_safe_directory"
+fi
+git_config_index="${GIT_CONFIG_COUNT:-0}"
+export "GIT_CONFIG_KEY_${git_config_index}=safe.directory"
+export "GIT_CONFIG_VALUE_${git_config_index}=$android_build_safe_directory"
+export GIT_CONFIG_COUNT=$((git_config_index + 1))
+
+# repo 2.54 enables TRACE_FILE by default; parallel sync workers can trip over
+# the shared trace file on the mounted workspace volume.
+export REPO_TRACE="${REPO_TRACE:-0}"
+
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs -g default,microg
 
 rm -rf .repo/local_manifests
