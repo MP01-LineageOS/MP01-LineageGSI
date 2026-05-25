@@ -10,6 +10,7 @@ build_tmp_dir="${MP01_BUILD_TMPDIR:-$workspace_build_dir/tmp}"
 export CCACHE_DIR="${CCACHE_DIR:-${MP01_CCACHE_DIR:-$workspace_build_dir/ccache}}"
 export CCACHE_EXEC="${CCACHE_EXEC:-$(command -v ccache || true)}"
 export SOONG_FINDER_THREADS="${SOONG_FINDER_THREADS:-1}"
+export BLUEPRINT_PARSE_THREADS="${BLUEPRINT_PARSE_THREADS:-1}"
 manifest_repo_override="${MP01_MANIFEST_REPO+x}"
 support_repo_override="${MP01_SUPPORT_REPO+x}"
 source "$script_dir/scripts/release-inputs.sh"
@@ -71,6 +72,7 @@ if [[ "$current_nofile" != "unlimited" && "$current_nofile" -lt "$required_nofil
 fi
 echo "Android build open-file soft limit: $(ulimit -Sn)"
 echo "Android build Soong finder threads: $SOONG_FINDER_THREADS"
+echo "Android build Blueprint parse threads: $BLUEPRINT_PARSE_THREADS"
 echo "Android build make jobs: $make_jobs"
 
 if [[ -n "${CCACHE_EXEC}" ]]; then

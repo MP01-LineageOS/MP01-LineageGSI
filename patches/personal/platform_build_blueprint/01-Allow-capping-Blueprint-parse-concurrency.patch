@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MP01 Build Automation <mp01-build@example.invalid>
+Date: Mon, 25 May 2026 19:33:00 +0000
+Subject: [PATCH] blueprint: Allow capping parse concurrency
+
+Host-shared macOS volumes can report EMFILE while Blueprint opens many
+Android.bp files concurrently. Preserve the upstream default, but allow
+local builds to reduce parse concurrency through an environment variable.
+---
+ context.go | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/context.go b/context.go
+index 657b3f4..83b0673 100644
+--- a/context.go
++++ b/context.go
+@@ -61,6 +61,17 @@ const OutFilePermissions = 0666
+ const BuildActionsCacheFile = "build_actions.gob"
+ const OrderOnlyStringsCacheFile = "order_only_strings.gob"
+ 
++func blueprintParseConcurrency() int {
++	if value := os.Getenv("BLUEPRINT_PARSE_THREADS"); value != "" {
++		threads, err := strconv.Atoi(value)
++		if err == nil && threads > 0 {
++			return threads
++		}
++	}
++
++	return 200
++}
++
+ // A Context contains all the state needed to parse a set of Blueprints files
+ // and generate a Ninja file.  The process of generating a Ninja file proceeds
+ // through a series of four phases.  Each phase corresponds with a some methods
+@@ -1224,9 +1235,9 @@ func (c *Context) WalkBlueprintsFiles(rootDir string, filePaths []string,
+ 	var pending []fileParseContext
+ 	tooManyErrors := false
+ 
+-	// Limit concurrent calls to parseBlueprintFiles to 200
+-	// Darwin has a default limit of 256 open files
+-	maxActiveCount := 200
++	// Limit concurrent calls to parseBlueprintFiles.
++	// Darwin has a default limit of 256 open files.
++	maxActiveCount := blueprintParseConcurrency()
+ 
+ 	// count the number of pending calls to visitor()
+ 	visitorWaitGroup := sync.WaitGroup{}
+-- 
+2.50.1
+
