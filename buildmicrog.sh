@@ -19,7 +19,7 @@ support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
 repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
 skip_repo_sync="${MP01_SKIP_REPO_SYNC:-0}"
-required_nofile="${MP01_BUILD_NOFILE:-65536}"
+required_nofile="${MP01_BUILD_NOFILE:-262144}"
 export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
 export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
 
@@ -66,6 +66,7 @@ if [[ "$current_nofile" != "unlimited" && "$current_nofile" -lt "$required_nofil
         exit 1
     fi
 fi
+echo "Android build open-file soft limit: $(ulimit -Sn)"
 
 if [[ -n "${CCACHE_EXEC}" ]]; then
     export USE_CCACHE=1
