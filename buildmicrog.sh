@@ -19,6 +19,7 @@ support_repo="$MP01_SUPPORT_REPO"
 support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
 repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
+make_jobs="${MP01_MAKE_JOBS:-1}"
 skip_repo_sync="${MP01_SKIP_REPO_SYNC:-0}"
 skip_source_prep="${MP01_SKIP_SOURCE_PREP:-0}"
 required_nofile="${MP01_BUILD_NOFILE:-262144}"
@@ -70,6 +71,7 @@ if [[ "$current_nofile" != "unlimited" && "$current_nofile" -lt "$required_nofil
 fi
 echo "Android build open-file soft limit: $(ulimit -Sn)"
 echo "Android build Soong finder threads: $SOONG_FINDER_THREADS"
+echo "Android build make jobs: $make_jobs"
 
 if [[ -n "${CCACHE_EXEC}" ]]; then
     export USE_CCACHE=1
@@ -94,6 +96,11 @@ case "$skip_source_prep" in
         exit 1
         ;;
 esac
+
+if ! [[ "$make_jobs" =~ ^[1-9][0-9]*$ ]]; then
+    echo "ERROR: MP01_MAKE_JOBS must be a positive integer." >&2
+    exit 1
+fi
 
 case_check_dir="$workspace_build_dir/.mp01-case-check"
 rm -rf "$case_check_dir"
@@ -256,7 +263,7 @@ if [[ -z "${OUT:-}" ]]; then
     exit 1
 fi
 
-make target-files-package otatools -j"$(nproc --all)"
+make target-files-package otatools -j"$make_jobs"
 
 build_date=$(date +%s)
 image_filename="MP01-Lineage-${build_date}-microG-unsigned.img"
