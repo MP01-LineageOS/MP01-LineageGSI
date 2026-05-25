@@ -6,6 +6,7 @@ workspace_dir="$(cd "$script_dir/.." && pwd)"
 workspace_build_dir="${MP01_WORKSPACE_BUILD_DIR:-$workspace_dir/.android-build}"
 build_root="${MP01_BUILD_ROOT:-$workspace_build_dir/los22-microg}"
 image_dir="${MP01_IMAGE_DIR:-$workspace_dir/images}"
+build_tmp_dir="${MP01_BUILD_TMPDIR:-$workspace_build_dir/tmp}"
 export CCACHE_DIR="${CCACHE_DIR:-${MP01_CCACHE_DIR:-$workspace_build_dir/ccache}}"
 export CCACHE_EXEC="${CCACHE_EXEC:-$(command -v ccache || true)}"
 manifest_repo_override="${MP01_MANIFEST_REPO+x}"
@@ -42,8 +43,18 @@ codex_require_large_state_path "$workspace_build_dir" "workspace build directory
 codex_require_large_state_path "$build_root" "Android build root"
 codex_require_large_state_path "$CCACHE_DIR" "ccache directory"
 codex_require_large_state_path "$image_dir" "image output directory"
+codex_require_large_state_path "$build_tmp_dir" "Android temporary directory"
 
-mkdir -p "$workspace_build_dir" "$build_root" "$image_dir"
+mkdir -p "$workspace_build_dir" "$build_root" "$image_dir" "$build_tmp_dir"
+
+# The Codex container intentionally mounts /tmp noexec. Android's Go bootstrap
+# executes generated helpers from its temp directory, so keep temp state on the
+# workspace build volume.
+export TMPDIR="$build_tmp_dir"
+export TMP="$build_tmp_dir"
+export TEMP="$build_tmp_dir"
+export GOTMPDIR="${GOTMPDIR:-$build_tmp_dir/go}"
+mkdir -p "$GOTMPDIR"
 
 if [[ -n "${CCACHE_EXEC}" ]]; then
     export USE_CCACHE=1
@@ -183,8 +194,17 @@ done
 
 set +u
 source build/envsetup.sh
-lunch treble_arm64_bmN-bp1a-userdebug
+if ! lunch treble_arm64_bmN-bp1a-userdebug; then
+    set -u
+    echo "ERROR: lunch failed for treble_arm64_bmN-bp1a-userdebug" >&2
+    exit 1
+fi
 set -u
+
+if [[ -z "${OUT:-}" ]]; then
+    echo "ERROR: lunch did not set OUT for treble_arm64_bmN-bp1a-userdebug" >&2
+    exit 1
+fi
 
 make target-files-package otatools -j"$(nproc --all)"
 
