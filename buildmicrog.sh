@@ -16,7 +16,17 @@ manifest_branch="$MP01_MANIFEST_BRANCH"
 support_repo="$MP01_SUPPORT_REPO"
 support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
-allow_non_workspace_build="${MP01_ALLOW_NON_WORKSPACE_BUILD:-0}"
+export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
+export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
+
+workspace_paths_helper="${CODEX_HOME:-$HOME/.codex}/lib/codex_container/workspace_paths.sh"
+if [[ -f "$workspace_paths_helper" ]]; then
+    source "$workspace_paths_helper"
+else
+    echo "ERROR: Missing Codex workspace path helper: $workspace_paths_helper" >&2
+    echo "Run this script through /Users/j/.codex/bin/codex-in-container after redeploying the container system." >&2
+    exit 1
+fi
 
 if [[ -z "$manifest_repo_override" && -d "$script_dir/../treble_manifest/.git" ]]; then
     manifest_repo="$(cd "$script_dir/../treble_manifest" && pwd)"
@@ -27,54 +37,10 @@ if [[ -z "$support_repo_override" ]]; then
     support_branch=""
 fi
 
-check_free_space() {
-    local path="$1"
-    local required_gb="$2"
-    local available_kib
-    local available_gb
-    local required_kib
-
-    mkdir -p "$path"
-    available_kib="$(df -Pk "$path" | awk 'NR == 2 {print $4}')"
-    required_kib=$((required_gb * 1024 * 1024))
-
-    if (( available_kib < required_kib )); then
-        available_gb=$((available_kib / 1024 / 1024))
-        echo "ERROR: Not enough free space for Android source/build." >&2
-        echo "Path: $path" >&2
-        echo "Available: ${available_gb}G" >&2
-        echo "Required: ${required_gb}G" >&2
-        echo "Set MP01_WORKSPACE_BUILD_DIR or MP01_BUILD_ROOT to a larger disk." >&2
-        exit 1
-    fi
-}
-
-require_workspace_path() {
-    local path="${1:?path is required}"
-    local label="${2:?label is required}"
-    local resolved
-    local resolved_workspace
-
-    resolved="$(realpath -m "$path")"
-    resolved_workspace="$(realpath -m "$workspace_dir")"
-    case "$resolved" in
-        "$resolved_workspace"|"$resolved_workspace"/*) ;;
-        *)
-            if [[ "$allow_non_workspace_build" != "1" ]]; then
-                echo "ERROR: $label must be under the MP01 workspace on the attached Code volume." >&2
-                echo "Path: $resolved" >&2
-                echo "Workspace: $resolved_workspace" >&2
-                echo "Set MP01_ALLOW_NON_WORKSPACE_BUILD=1 only if you intentionally choose another large disk." >&2
-                exit 1
-            fi
-            ;;
-    esac
-}
-
-require_workspace_path "$workspace_build_dir" "workspace build directory"
-require_workspace_path "$build_root" "Android build root"
-require_workspace_path "$CCACHE_DIR" "ccache directory"
-require_workspace_path "$image_dir" "image output directory"
+codex_require_large_state_path "$workspace_build_dir" "workspace build directory"
+codex_require_large_state_path "$build_root" "Android build root"
+codex_require_large_state_path "$CCACHE_DIR" "ccache directory"
+codex_require_large_state_path "$image_dir" "image output directory"
 
 mkdir -p "$workspace_build_dir" "$build_root" "$image_dir"
 
@@ -84,7 +50,7 @@ if [[ -n "${CCACHE_EXEC}" ]]; then
     ccache -M 200G
 fi
 
-check_free_space "$workspace_build_dir" "$min_free_gb"
+codex_check_free_space_gib "$workspace_build_dir" "$min_free_gb"
 mp01_ensure_repo_launcher "$build_root/.bin"
 cd "$build_root"
 
