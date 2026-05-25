@@ -51,6 +51,21 @@ if [[ -n "${CCACHE_EXEC}" ]]; then
 fi
 
 codex_check_free_space_gib "$workspace_build_dir" "$min_free_gb"
+
+case_check_dir="$workspace_build_dir/.mp01-case-check"
+rm -rf "$case_check_dir"
+mkdir -p "$case_check_dir"
+: > "$case_check_dir/casecheck"
+if [[ -e "$case_check_dir/CASECHECK" ]]; then
+    rm -rf "$case_check_dir"
+    echo "ERROR: Android source builds require a case-sensitive filesystem." >&2
+    echo "Path is case-insensitive: $workspace_build_dir" >&2
+    echo "Mount a case-sensitive volume under the MP01 workspace and set MP01_WORKSPACE_BUILD_DIR to that path." >&2
+    exit 1
+fi
+: > "$case_check_dir/CASECHECK"
+rm -rf "$case_check_dir"
+
 mp01_ensure_repo_launcher "$build_root/.bin"
 cd "$build_root"
 
