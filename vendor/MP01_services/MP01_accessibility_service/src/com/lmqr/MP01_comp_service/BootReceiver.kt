@@ -3,7 +3,6 @@ package com.lmqr.hMP01_comp_service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.SystemProperties
 import android.provider.Settings
 import android.util.Log
 
@@ -16,7 +15,7 @@ class BootReceiver : BroadcastReceiver() {
         }
 
         // Get the intended service from system property
-        val propertyValue = SystemProperties.get(
+        val propertyValue = MP01SystemProperties.get(
             "persist.accessibility.enabled_service", "")
             
         // Check if service is already enabled

@@ -2,7 +2,6 @@ package com.lmqr.hMP01_comp_service
 
 import android.app.UiModeManager
 import android.content.Context
-import android.os.SystemProperties
 import android.provider.Settings
 import android.util.Log
 
@@ -16,7 +15,7 @@ object MP01Defaults {
 
     fun applyIfNeeded(context: Context): Boolean {
         val resolver = context.contentResolver
-        val forceDefaults = SystemProperties.get(KEY_FORCE_DEFAULTS, "") == "1"
+        val forceDefaults = MP01SystemProperties.get(KEY_FORCE_DEFAULTS, "") == "1"
         val appliedVersion = Settings.Secure.getInt(resolver, KEY_DEFAULTS_VERSION, 0)
         val userSetupComplete = Settings.Secure.getInt(resolver, KEY_USER_SETUP_COMPLETE, 0) == 1
 
