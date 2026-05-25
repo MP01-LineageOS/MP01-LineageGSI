@@ -18,6 +18,7 @@ support_repo="$MP01_SUPPORT_REPO"
 support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
 repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
+skip_repo_sync="${MP01_SKIP_REPO_SYNC:-0}"
 required_nofile="${MP01_BUILD_NOFILE:-65536}"
 export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
 export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
@@ -73,6 +74,14 @@ if [[ -n "${CCACHE_EXEC}" ]]; then
 fi
 
 codex_check_free_space_gib "$workspace_build_dir" "$min_free_gb"
+
+case "$skip_repo_sync" in
+    0|1) ;;
+    *)
+        echo "ERROR: MP01_SKIP_REPO_SYNC must be 0 or 1." >&2
+        exit 1
+        ;;
+esac
 
 case_check_dir="$workspace_build_dir/.mp01-case-check"
 rm -rf "$case_check_dir"
@@ -137,7 +146,9 @@ repo_sync_args=(
     --force-checkout
     --force-remove-dirty
 )
-if ! repo sync "${repo_sync_args[@]}" -j"$repo_sync_jobs"; then
+if [[ "$skip_repo_sync" == "1" ]]; then
+    echo "Skipping repo sync because MP01_SKIP_REPO_SYNC=1; reusing existing Android checkout."
+elif ! repo sync "${repo_sync_args[@]}" -j"$repo_sync_jobs"; then
     echo "repo sync failed with -j$repo_sync_jobs; retrying serially with --fail-fast." >&2
     repo sync "${repo_sync_args[@]}" -j1 --fail-fast
 fi
