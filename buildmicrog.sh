@@ -77,7 +77,9 @@ if ! git config --global --get-all safe.directory | grep -Fx -- "$android_build_
 fi
 git_config_index="${GIT_CONFIG_COUNT:-0}"
 export "GIT_CONFIG_KEY_${git_config_index}=safe.directory"
-export "GIT_CONFIG_VALUE_${git_config_index}=$android_build_safe_directory"
+# repo creates transient nested git directories such as .repo/repo.tmp before
+# project paths exist, so the child process needs Git's full opt-out form.
+export "GIT_CONFIG_VALUE_${git_config_index}=*"
 export GIT_CONFIG_COUNT=$((git_config_index + 1))
 
 # repo 2.54 enables TRACE_FILE by default; parallel sync workers can trip over
