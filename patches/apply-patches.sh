@@ -11,6 +11,30 @@ trebledroid="$source/patches/trebledroid"
 personal="$source/patches/personal"
 minimal="$source/patches/minimal"
 
+apply_patch_file() {
+	local patch_file="$1"
+
+	if patch -f -p1 --dry-run -R < "$patch_file" > /dev/null; then
+		printf "### ALREDY APPLIED: $patch_file \n";
+		return 0
+	fi
+
+	if git am "$patch_file"; then
+		return 0
+	fi
+
+	if patch -f -p1 --dry-run < "$patch_file" > /dev/null; then
+		patch -f -p1 < "$patch_file"
+		git add -u
+		git am --continue
+		return 0
+	fi
+
+	git am --abort || true
+	printf "### FAILED APPLYING: $patch_file \n"
+	return 1
+}
+
 printf "\n ### APPLYING TREBLEDROID PATCHES ###\n";
 sleep 1.0;
 for path in $(cd $trebledroid; echo *); do
@@ -22,23 +46,7 @@ for path in $(cd $trebledroid; echo *); do
 	pushd $tree
 
 	for patch in $trebledroid/$path/*.patch; do
-		# Check if patch is already applied
-		if patch -f -p1 --dry-run -R < $patch > /dev/null; then
-            printf "### ALREDY APPLIED: $patch \n";
-			continue
-		fi
-
-		if git apply --check $patch; then
-			git am $patch
-		elif patch -f -p1 --dry-run < $patch > /dev/null; then
-			#This will fail
-			git am $patch || true
-			patch -f -p1 < $patch
-			git add -u
-			git am --continue
-		else
-			printf "### FAILED APPLYING: $patch \n"
-		fi
+		apply_patch_file "$patch"
 	done
 
 	popd
@@ -56,23 +64,7 @@ for path_personal in $(cd $personal; echo *); do
 	pushd $tree
 
 	for patch in $personal/$path_personal/*.patch; do
-		# Check if patch is already applied
-		if patch -f -p1 --dry-run -R < $patch > /dev/null; then
-            printf "### ALREDY APPLIED: $patch \n";
-			continue
-		fi
-
-		if git apply --check $patch; then
-			git am $patch
-		elif patch -f -p1 --dry-run < $patch > /dev/null; then
-			#This will fail
-			git am $patch || true
-			patch -f -p1 < $patch
-			git add -u
-			git am --continue
-		else
-			printf "### FAILED APPLYING: $patch \n"
-		fi
+		apply_patch_file "$patch"
 	done
 
 	popd
@@ -89,23 +81,7 @@ for path in $(cd $minimal; echo *); do
 	pushd $tree
 
 	for patch in $minimal/$path/*.patch; do
-		# Check if patch is already applied
-		if patch -f -p1 --dry-run -R < $patch > /dev/null; then
-            printf "### ALREDY APPLIED: $patch \n";
-			continue
-		fi
-
-		if git apply --check $patch; then
-			git am $patch
-		elif patch -f -p1 --dry-run < $patch > /dev/null; then
-			#This will fail
-			git am $patch || true
-			patch -f -p1 < $patch
-			git add -u
-			git am --continue
-		else
-			printf "### FAILED APPLYING: $patch \n"
-		fi
+		apply_patch_file "$patch"
 	done
 
 	popd

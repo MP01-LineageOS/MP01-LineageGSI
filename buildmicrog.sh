@@ -16,6 +16,7 @@ manifest_branch="$MP01_MANIFEST_BRANCH"
 support_repo="$MP01_SUPPORT_REPO"
 support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
+repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
 export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
 export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
 
@@ -86,6 +87,11 @@ export GIT_CONFIG_COUNT=$((git_config_index + 1))
 # the shared trace file on the mounted workspace volume.
 export REPO_TRACE="${REPO_TRACE:-0}"
 
+# TrebleDroid patches are applied with git-am inside freshly synced Android
+# projects, where the container does not have a user identity configured.
+export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-MP01 Build Automation}"
+export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-mp01-build@example.invalid}"
+
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs -g default,microg
 
 rm -rf .repo/local_manifests
@@ -101,7 +107,19 @@ cat > .repo/local_manifests/zz_mp01_microg.xml <<'EOF'
 EOF
 
 # This build root is intentionally variant-specific and can be force-synced.
-repo sync --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune --force-checkout --force-remove-dirty -j8
+repo_sync_args=(
+    --force-sync
+    --optimized-fetch
+    --no-tags
+    --no-clone-bundle
+    --prune
+    --force-checkout
+    --force-remove-dirty
+)
+if ! repo sync "${repo_sync_args[@]}" -j"$repo_sync_jobs"; then
+    echo "repo sync failed with -j$repo_sync_jobs; retrying serially with --fail-fast." >&2
+    repo sync "${repo_sync_args[@]}" -j1 --fail-fast
+fi
 
 if [[ -d vendor/gapps ]]; then
     echo "ERROR: vendor/gapps is present in the microG build graph." >&2
@@ -163,8 +181,10 @@ for apk in "${expected_microg_apks[@]}"; do
     fi
 done
 
+set +u
 source build/envsetup.sh
 lunch treble_arm64_bmN-bp1a-userdebug
+set -u
 
 make target-files-package otatools -j"$(nproc --all)"
 
