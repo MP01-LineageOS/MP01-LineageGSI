@@ -19,6 +19,7 @@ support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
 repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
 skip_repo_sync="${MP01_SKIP_REPO_SYNC:-0}"
+skip_source_prep="${MP01_SKIP_SOURCE_PREP:-0}"
 required_nofile="${MP01_BUILD_NOFILE:-262144}"
 export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
 export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
@@ -84,6 +85,14 @@ case "$skip_repo_sync" in
         ;;
 esac
 
+case "$skip_source_prep" in
+    0|1) ;;
+    *)
+        echo "ERROR: MP01_SKIP_SOURCE_PREP must be 0 or 1." >&2
+        exit 1
+        ;;
+esac
+
 case_check_dir="$workspace_build_dir/.mp01-case-check"
 rm -rf "$case_check_dir"
 mkdir -p "$case_check_dir"
@@ -123,6 +132,21 @@ export REPO_TRACE="${REPO_TRACE:-0}"
 export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-MP01 Build Automation}"
 export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-mp01-build@example.invalid}"
 
+if [[ "$skip_source_prep" == "1" ]]; then
+    echo "Skipping Android source preparation because MP01_SKIP_SOURCE_PREP=1; reusing prepared checkout."
+    required_prepared_paths=(
+        build/envsetup.sh
+        device/phh/treble/AndroidProducts.mk
+        vendor/partner_gms/vendorsetup.sh
+        vendor/finqwerty/"$MP01_FINQWERTY_APK_NAME"
+    )
+    for prepared_path in "${required_prepared_paths[@]}"; do
+        if [[ ! -e "$prepared_path" ]]; then
+            echo "ERROR: Prepared Android checkout is missing: $prepared_path" >&2
+            exit 1
+        fi
+    done
+else
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs -g default,microg
 
 rm -rf .repo/local_manifests
@@ -197,6 +221,7 @@ cp -R MP01Support/vendor/. vendor/
 rm -rf MP01Support
 
 mp01_download_finqwerty_apk "vendor/finqwerty/$MP01_FINQWERTY_APK_NAME"
+fi
 
 bash vendor/partner_gms/vendorsetup.sh
 
