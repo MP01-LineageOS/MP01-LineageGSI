@@ -10,6 +10,11 @@ import android.util.Log
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("MP01BootReceiver", "Boot receiver triggered with action: ${intent.action}")
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED ||
+            intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+            MP01Defaults.applyIfNeeded(context)
+        }
+
         // Get the intended service from system property
         val propertyValue = SystemProperties.get(
             "persist.accessibility.enabled_service", "")

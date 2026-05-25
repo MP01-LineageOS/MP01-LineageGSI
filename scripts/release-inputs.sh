@@ -21,6 +21,11 @@
 : "${MP01_FDROID_APK_SHA256:=985f5181d48bb6bafd54083a048b391271e0ab28385881cc41294fb01a222762}"
 : "${MP01_FDROID_CERT_SHA256:=43:23:8D:51:2C:1E:5E:B2:D6:56:9F:4A:3A:FB:F5:52:34:18:B8:2E:0A:3E:D1:55:27:70:AB:B9:A9:C9:CC:AB}"
 
+: "${MP01_TREBLE_PRESETS_COMMIT:=09fdae135930b553c54aba7aa9a07b105132b6ff}"
+: "${MP01_TREBLE_PRESETS_NAME:=infos.json}"
+: "${MP01_TREBLE_PRESETS_URL:=https://raw.githubusercontent.com/MP01-LineageOS/treble_presets/${MP01_TREBLE_PRESETS_COMMIT}/infos.json}"
+: "${MP01_TREBLE_PRESETS_SHA256:=1fef71972d881ea508b15715cd165d0fb7954652c5871e8c054c7cd6fd8ede31}"
+
 : "${MP01_BASELINE_RELEASE_TAG:=1755162498}"
 : "${MP01_BASELINE_RELEASE_TITLE:=2025-08-14 (LineageOS 22.2) [1755162498]}"
 : "${MP01_BASELINE_TAR_NAME:=MP01-Lineage-1755162498-signed.tar.gz}"
@@ -173,6 +178,16 @@ mp01_download_fdroid_apk() {
         "F-Droid ${MP01_FDROID_VERSION}"
     mp01_validate_apk "$output" "F-Droid ${MP01_FDROID_VERSION}"
     mp01_verify_apk_cert_sha256 "$output" "$MP01_FDROID_CERT_SHA256" "F-Droid ${MP01_FDROID_VERSION}"
+}
+
+mp01_download_treble_presets() {
+    local output="${1:?output presets path is required}"
+
+    mp01_download_and_verify \
+        "$MP01_TREBLE_PRESETS_URL" \
+        "$output" \
+        "$MP01_TREBLE_PRESETS_SHA256" \
+        "Treble presets ${MP01_TREBLE_PRESETS_COMMIT}"
 }
 
 mp01_ensure_repo_launcher() {

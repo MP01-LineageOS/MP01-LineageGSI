@@ -7,8 +7,8 @@ Subject: [PATCH] Patch finishSetupWizard to call our set our launcher and call
 Change-Id: I971f4632e54e77e4a1a1e1c49920a279d9c7edae
 ---
  exit_wizard.sh                                |  2 +
- .../setupwizard/util/SetupWizardUtils.java    | 78 +++++++++++++++++++
- 2 files changed, 80 insertions(+)
+ .../setupwizard/util/SetupWizardUtils.java    | 82 +++++++++++++++++++
+ 2 files changed, 84 insertions(+)
 
 diff --git a/exit_wizard.sh b/exit_wizard.sh
 index 9c03eb0..0b86fae 100755
@@ -18,7 +18,7 @@ index 9c03eb0..0b86fae 100755
  wait ${!}
  has_google_suw=$(adb shell pm list packages com.google.android.setupwizard)
  adb shell pm enable org.lineageos.setupwizard/.FinishActivity || true
-+adb shell cmd package set-home-activity "app.inkos/.MainActivity"
++adb shell cmd package set-home-activity "app.inkos/com.github.gezimos.inkos.MainActivity"
 +adb shell am start -a android.intent.action.MAIN -c android.intent.category.HOME
  if [[ ! -z "$has_google_suw" ]]
  then
@@ -32,32 +32,34 @@ index 8315523..0a1a646 100644
  import java.io.File;
  import java.util.List;
 +import android.app.role.RoleManager;
-+import java.util.concurrent.Executor;
++import android.content.ComponentName;
 +import java.util.function.Consumer;
  
  public class SetupWizardUtils {
  
-@@ -67,6 +70,7 @@ public class SetupWizardUtils {
+@@ -67,6 +70,8 @@ public class SetupWizardUtils {
      private static final String GMS_SUW_PACKAGE = "com.google.android.setupwizard";
      private static final String GMS_TV_SUW_PACKAGE = "com.google.android.tungsten.setupwraith";
      private static final String UPDATER_PACKAGE = "org.lineageos.updater";
-+    private static final String TARGET_HOME_PACKAGE = "app.inkos";
++    private static final ComponentName TARGET_HOME_COMPONENT =
++            new ComponentName("app.inkos", "com.github.gezimos.inkos.MainActivity");
  
      private static final String UPDATE_RECOVERY_EXEC = "/vendor/bin/install-recovery.sh";
      private static final String CONFIG_HIDE_RECOVERY_UPDATE = "config_hideRecoveryUpdate";
-@@ -171,6 +175,76 @@ public class SetupWizardUtils {
+@@ -171,6 +176,79 @@ public class SetupWizardUtils {
          }
      }
  
 +    /**
-+     * Set the default home activity to app.inkos/.MainActivity and launch it.
++     * Set the default home activity to app.inkos/com.github.gezimos.inkos.MainActivity and launch it.
 +     * This method should be called when the setup wizard finishes.
 +     */
 +    private static void setDefaultHomeAndLaunch(Context context) {
 +        try {
++            final String targetHomePackage = TARGET_HOME_COMPONENT.getPackageName();
 +            // Check if the target package is installed
-+            if (!isPackageInstalled(context, TARGET_HOME_PACKAGE)) {
-+                Log.w(TAG, "Target package " + TARGET_HOME_PACKAGE + " is not installed, skipping home setup");
++            if (!isPackageInstalled(context, targetHomePackage)) {
++                Log.w(TAG, "Target package " + targetHomePackage + " is not installed, skipping home setup");
 +                return;
 +            }
 +            
@@ -70,17 +72,17 @@ index 8315523..0a1a646 100644
 +            final int userId = UserHandle.myUserId();
 +
 +            // Set the default home activity
-+            roleManager.addRoleHolderAsUser(RoleManager.ROLE_HOME, TARGET_HOME_PACKAGE, 0,
++            roleManager.addRoleHolderAsUser(RoleManager.ROLE_HOME, targetHomePackage, 0,
 +                    UserHandle.of(userId), context.getMainExecutor(),
 +                    new Consumer<Boolean>() {
 +                        @Override
 +                        public void accept(Boolean success) {
 +                            if (success) {
-+                                Log.i(TAG, "Successfully set " + TARGET_HOME_PACKAGE + " as default home");
++                                Log.i(TAG, "Successfully set " + targetHomePackage + " as default home");
 +                                // Launch the home activity
 +                                launchHomeActivity(context);
 +                            } else {
-+                                Log.e(TAG, "Failed to set " + TARGET_HOME_PACKAGE + " as default home");
++                                Log.e(TAG, "Failed to set " + targetHomePackage + " as default home");
 +                            }
 +                        }
 +                    });
@@ -91,27 +93,29 @@ index 8315523..0a1a646 100644
 +    }
 +
 +    /**
-+     * Launch the home activity with android.intent.action.MAIN and android.intent.category.HOME.
++     * Launch the explicit inkOS home activity, with the system home intent as fallback.
 +     */
 +    private static void launchHomeActivity(Context context) {
 +        try {
 +            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
 +            homeIntent.addCategory(Intent.CATEGORY_HOME);
 +            homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
++            homeIntent.setComponent(TARGET_HOME_COMPONENT);
 +            
-+            // Try to launch the specific target package first
-+            homeIntent.setPackage(TARGET_HOME_PACKAGE);
++            // Try to launch the specific target component first
 +            try {
 +                context.startActivity(homeIntent);
-+                Log.i(TAG, "Launched " + TARGET_HOME_PACKAGE + " as home activity");
++                Log.i(TAG, "Launched " + TARGET_HOME_COMPONENT.flattenToShortString() + " as home activity");
 +                return;
 +            } catch (Exception e) {
-+                Log.w(TAG, "Failed to launch " + TARGET_HOME_PACKAGE + ", falling back to system default", e);
++                Log.w(TAG, "Failed to launch " + TARGET_HOME_COMPONENT.flattenToShortString() + ", falling back to system default", e);
 +            }
 +            
 +            // Fallback to system default home
-+            homeIntent.setPackage(null);
-+            context.startActivity(homeIntent);
++            Intent fallbackIntent = new Intent(Intent.ACTION_MAIN);
++            fallbackIntent.addCategory(Intent.CATEGORY_HOME);
++            fallbackIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
++            context.startActivity(fallbackIntent);
 +            Log.i(TAG, "Launched system default home activity");
 +            
 +        } catch (Exception e) {
@@ -122,7 +126,7 @@ index 8315523..0a1a646 100644
      public static void finishSetupWizard(BaseSetupWizardActivity context) {
          if (LOGV) {
              Log.v(TAG, "finishSetupWizard");
-@@ -198,6 +272,10 @@ public class SetupWizardUtils {
+@@ -198,6 +276,10 @@ public class SetupWizardUtils {
          WallpaperManager.getInstance(context).forgetLoadedWallpaper();
          disableHome(context);
          enableStatusBar();
@@ -135,4 +139,3 @@ index 8315523..0a1a646 100644
          Log.i(TAG, "Setup complete!");
 -- 
 2.43.0
-

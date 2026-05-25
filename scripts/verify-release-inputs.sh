@@ -27,7 +27,12 @@ mkdir -p "$download_dir"
 
 mp01_download_finqwerty_apk "$download_dir/$MP01_FINQWERTY_APK_NAME"
 mp01_download_fdroid_apk "$download_dir/$MP01_FDROID_APK_NAME"
+mp01_download_treble_presets "$download_dir/$MP01_TREBLE_PRESETS_NAME"
+
+mp01_require_tool python3
+python3 -m json.tool "$download_dir/$MP01_TREBLE_PRESETS_NAME" >/dev/null
 
 echo "Verified pinned MP01 release inputs:"
 echo "  FinQwerty: $MP01_FINQWERTY_VERSION"
 echo "  F-Droid: $MP01_FDROID_VERSION"
+echo "  Treble presets: $MP01_TREBLE_PRESETS_COMMIT"

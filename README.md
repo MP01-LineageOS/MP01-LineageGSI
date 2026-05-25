@@ -10,14 +10,16 @@ For known issues, bug reports, and future features see the project [issues](http
 - [Dumbphone Hangout Discord](https://discord.gg/Emt3jwUMg9) - I'll be posting updates in the #mp01-lineage-updates channel
 - [Minimal Phone MP01 Unlock & Flashing Guide](https://chardidath.ing/posts/mp01-flashing-guide/)
 
-### Current Workarounds
-1. Presets aren't setup OOB, go to Settings > PHH Settings > My device > Apply presets
-2. IMS isn't setup OOB, go to Settings > PHH Settings > IMS features > and tap on `Create IMS APN` and `Install IMS APK for MediaTek R+ vendor` Reboot when you see `You may reboot!`
-> As far as I know this should be done automatically by treble presets, but isn't?
-3. Out of the box, the keyboard layout isn't fully functional, to fix this, open `FinQwerty` > `Physical Keyboard Settings` and change the layout to `QWERTY English Layout for Minimal Phone MP01`.
-4. No launcher is set as the default. You can fix this when you open inkOS, it'll prompt you to set the default launcher.
-5. The dark theme is still the default, this is horrible on e-Ink, switch to Light during setup.
-6. The e-Ink panel auto switching can be a little finnicky, you can disable this by double clicking the refresh button, pressing the cog, and enabling `Disable Per-App Refreh Mode`.
+### Device Defaults Status
+
+| Default | Owner | Status |
+| --- | --- | --- |
+| Physical keyboard | `vendor/MP01_services/mp_keyboard` | Installed into `system/usr`; no manual FinQwerty layout selection should be needed when these files are present. |
+| Default launcher | SetupWizard patch in this repo | SetupWizard assigns inkOS as home and launches `app.inkos/com.github.gezimos.inkos.MainActivity`. |
+| Light theme | `MP01AccessibilityService` | First normal boot seeds `ui_night_mode=1` before setup completes. Existing configured phones are not overwritten unless `persist.mp01.defaults.force=1`. |
+| PHH presets | `treble_app` and `treble_presets` | MP01 products point at a pinned `MP01-LineageOS/treble_presets` `infos.json`. Verify with `scripts/verify-release-inputs.sh`. |
+| IMS defaults | `treble_presets` and `vendor_hardware_overlay` | Inventoried only in this pass. Radio-sensitive IMS behavior needs device testing before more changes. |
+| E-ink refresh tuning | `MP01AccessibilityService` | Still manual. Per-app refresh behavior needs device testing before changing defaults. |
 
 ### Build Script (Testing)
 ```bash
@@ -30,9 +32,9 @@ bash build.sh
 ### Release Inputs
 Downloaded release inputs are pinned in `scripts/release-inputs.sh`. Update the
 URL, version, and SHA256 together when intentionally moving to a new FinQwerty,
-F-Droid, repo-launcher, or baseline release artifact.
+F-Droid, Treble presets, repo-launcher, or baseline release artifact.
 
-Verify the pinned APK inputs without a full Android checkout:
+Verify the pinned inputs without a full Android checkout:
 
 ```bash
 bash scripts/verify-release-inputs.sh

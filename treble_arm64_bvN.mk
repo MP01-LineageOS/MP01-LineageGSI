@@ -22,13 +22,9 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true # jank - for inkOS
 
-# inkOS is set as the default launcher - idk if this is right
-#PRODUCT_PROPERTY_OVERRIDES += \
-#    ro.launcher.home=app.inkos
-# this seems to break things??
-
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-	ro.system.ota.json_url=https://raw.githubusercontent.com/MP01-LineageOS/MP01-LineageGSI/15/ota.json
+    ro.system.ota.json_url=https://raw.githubusercontent.com/MP01-LineageOS/MP01-LineageGSI/15/ota.json \
+    ro.system.treble.presets=https://raw.githubusercontent.com/MP01-LineageOS/treble_presets/09fdae135930b553c54aba7aa9a07b105132b6ff/infos.json
 
 LINEAGE_BUILDTYPE := VANILLA
 LINEAGE_EXTRAVERSION := -EXT4

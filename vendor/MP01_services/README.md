@@ -20,7 +20,10 @@ These mappings can be easily changed in the E-Ink Settings app
 Also, the default refresh mode can be changed in the e-ink settings app. The ideal mode is balanced. The other modes might make some elements invisible.
 
 ## Keyboard
-To make sure the keyboard works correctly, download the FinQwerty build from [here](https://github.com/vbbot/finqwerty/releases/tag/mp01-20250629) and follow the instructions mentioned in the release.
+The MP01 image installs `aw9523b-key.idc`, `aw9523b-key.kl`, and
+`aw9523b-key.kcm` into `system/usr`. The system key character map matches
+FinQwerty's Minimal Phone MP01 layout, so manual FinQwerty layout selection
+should not be required when these files are present.
 
 # Licensing
 
