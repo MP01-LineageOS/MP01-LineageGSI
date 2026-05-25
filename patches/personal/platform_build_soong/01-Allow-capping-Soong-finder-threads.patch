@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MP01 Build Automation <mp01-build@example.invalid>
+Date: Mon, 25 May 2026 19:10:00 +0000
+Subject: [PATCH] finder: Allow capping source finder threads
+
+Host-shared macOS volumes can report EMFILE during source finder scans
+even after the Linux nofile limit has been raised. Let local builds cap
+finder parallelism without changing the default upstream behavior.
+---
+ finder/finder.go | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/finder/finder.go b/finder/finder.go
+index 054ccd639..4d17c5e8a 100644
+--- a/finder/finder.go
++++ b/finder/finder.go
+@@ -25,6 +25,7 @@ import (
+ 	"path/filepath"
+ 	"runtime"
+ 	"sort"
++	"strconv"
+ 	"strings"
+ 	"sync"
+ 	"sync/atomic"
+@@ -166,7 +167,18 @@ type Finder struct {
+ 	nodes        pathMap
+ }
+ 
+-var defaultNumThreads = runtime.NumCPU() * 2
++var defaultNumThreads = configuredDefaultNumThreads()
++
++func configuredDefaultNumThreads() int {
++	if value := os.Getenv("SOONG_FINDER_THREADS"); value != "" {
++		threads, err := strconv.Atoi(value)
++		if err == nil && threads > 0 {
++			return threads
++		}
++	}
++
++	return runtime.NumCPU() * 2
++}
+ 
+ // New creates a new Finder for use
+ func New(cacheParams CacheParams, filesystem fs.FileSystem,
+-- 
+2.50.1
+
