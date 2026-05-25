@@ -147,7 +147,8 @@ repo_sync_args=(
     --force-remove-dirty
 )
 if [[ "$skip_repo_sync" == "1" ]]; then
-    echo "Skipping repo sync because MP01_SKIP_REPO_SYNC=1; reusing existing Android checkout."
+    echo "Skipping network repo sync because MP01_SKIP_REPO_SYNC=1; resetting worktree from local repo cache."
+    repo sync -l -d --force-sync --force-checkout --force-remove-dirty --no-manifest-update -j"$repo_sync_jobs" --fail-fast
 elif ! repo sync "${repo_sync_args[@]}" -j"$repo_sync_jobs"; then
     echo "repo sync failed with -j$repo_sync_jobs; retrying serially with --fail-fast." >&2
     repo sync "${repo_sync_args[@]}" -j1 --fail-fast
