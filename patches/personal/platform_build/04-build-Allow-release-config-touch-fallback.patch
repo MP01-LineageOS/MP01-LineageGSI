@@ -1,0 +1,30 @@
+From 7ec3cfda9f62c55ef8c2f8ba44f1d1f7b040a01a Mon Sep 17 00:00:00 2001
+From: MP01 LineageOS Maintainers <mp01-build@example.invalid>
+Date: Mon, 25 May 2026 11:42:00 -0400
+Subject: [PATCH] build: Allow release-config touch fallback
+
+Some shared workspace filesystems can reject the backdated timestamp used for
+generated release-config make fragments. Falling back to a normal touch keeps
+the generated file valid and only loses the stale-timestamp optimization.
+---
+ core/release_config.mk | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/core/release_config.mk b/core/release_config.mk
+index 9d9ab4b5a8..ba3ce5d9f5 100644
+--- a/core/release_config.mk
++++ b/core/release_config.mk
+@@ -138,7 +138,9 @@ ifneq (,$(_use_protobuf))
+     _flags_file:=$(_flags_dir)/release_config-$(TARGET_PRODUCT)-$(TARGET_RELEASE).vars
+     # release-config generates $(_flags_varmk)
+     _flags_varmk:=$(_flags_file:.vars=.varmk)
+-    $(shell $(OUT_DIR)/release-config $(_args) >$(OUT_DIR)/release-config.out && touch -t 200001010000 $(_flags_varmk))
++    # Fall back to the current mtime on shared filesystems that reject backdating.
++    $(shell $(OUT_DIR)/release-config $(_args) >$(OUT_DIR)/release-config.out && \
++        (touch -t 200001010000 $(_flags_varmk) || touch $(_flags_varmk)))
+     $(if $(filter-out 0,$(.SHELLSTATUS)),$(error release-config failed to run))
+     ifneq (,$(_final_product_config_pass))
+         # Save the final version of the config.
+-- 
+2.39.5
+
