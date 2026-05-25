@@ -18,6 +18,7 @@ support_repo="$MP01_SUPPORT_REPO"
 support_branch="$MP01_SUPPORT_BRANCH"
 min_free_gb="${MP01_MIN_FREE_GB:-400}"
 repo_sync_jobs="${MP01_REPO_SYNC_JOBS:-8}"
+required_nofile="${MP01_BUILD_NOFILE:-65536}"
 export CODEX_WORKSPACE_DIR="${CODEX_WORKSPACE_DIR:-$workspace_dir}"
 export CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE="${MP01_ALLOW_NON_WORKSPACE_BUILD:-${CODEX_ALLOW_NON_WORKSPACE_LARGE_STATE:-0}}"
 
@@ -55,6 +56,15 @@ export TMP="$build_tmp_dir"
 export TEMP="$build_tmp_dir"
 export GOTMPDIR="${GOTMPDIR:-$build_tmp_dir/go}"
 mkdir -p "$GOTMPDIR"
+
+current_nofile="$(ulimit -Sn)"
+if [[ "$current_nofile" != "unlimited" && "$current_nofile" -lt "$required_nofile" ]]; then
+    if ! ulimit -Sn "$required_nofile"; then
+        echo "ERROR: Unable to raise open-file limit to $required_nofile for Android build." >&2
+        echo "Current soft limit: $current_nofile; hard limit: $(ulimit -Hn)" >&2
+        exit 1
+    fi
+fi
 
 if [[ -n "${CCACHE_EXEC}" ]]; then
     export USE_CCACHE=1
