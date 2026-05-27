@@ -234,6 +234,8 @@ rm -rf MP01Support
 mp01_download_finqwerty_apk "vendor/finqwerty/$MP01_FINQWERTY_APK_NAME"
 fi
 
+mp01_ensure_fdroid_apk "vendor/F-Droid/$MP01_FDROID_APK_NAME"
+
 bash vendor/partner_gms/vendorsetup.sh
 
 expected_microg_apks=(

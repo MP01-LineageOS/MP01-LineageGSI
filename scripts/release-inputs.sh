@@ -180,6 +180,19 @@ mp01_download_fdroid_apk() {
     mp01_verify_apk_cert_sha256 "$output" "$MP01_FDROID_CERT_SHA256" "F-Droid ${MP01_FDROID_VERSION}"
 }
 
+mp01_ensure_fdroid_apk() {
+    local output="${1:?output APK path is required}"
+
+    if [[ -f "$output" ]]; then
+        mp01_verify_sha256 "$output" "$MP01_FDROID_APK_SHA256" "F-Droid ${MP01_FDROID_VERSION}"
+        mp01_validate_apk "$output" "F-Droid ${MP01_FDROID_VERSION}"
+        mp01_verify_apk_cert_sha256 "$output" "$MP01_FDROID_CERT_SHA256" "F-Droid ${MP01_FDROID_VERSION}"
+        return
+    fi
+
+    mp01_download_fdroid_apk "$output"
+}
+
 mp01_download_treble_presets() {
     local output="${1:?output presets path is required}"
 
