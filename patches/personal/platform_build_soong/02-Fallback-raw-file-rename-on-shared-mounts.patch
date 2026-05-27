@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MP01 Build Automation <mp01-build@example.invalid>
+Date: Wed, 27 May 2026 04:20:00 +0000
+Subject: [PATCH] soong: Fall back for raw files on shared mounts
+
+Host-shared macOS volumes can deny occasional Soong raw-file renames
+or temp-file creation under heavy module generation. Fall back to local
+container temp storage when opening the workspace temp file fails, and
+fall back to copying the already-closed temporary file into place when
+rename is denied. Keep the upstream workspace-temp and rename paths as
+the normal fast paths.
+---
+ android/raw_files.go | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/android/raw_files.go b/android/raw_files.go
+index 9d7f5e82d..226722e8c 100644
+--- a/android/raw_files.go
++++ b/android/raw_files.go
+@@ -67,7 +67,10 @@ func newTempFile(ctx BuilderContext, pattern string, testMode bool) *tempFile {
+ 	} else {
+ 		f, err := os.CreateTemp(absolutePath(ctx.Config().tempDir()), pattern)
+ 		if err != nil {
+-			panic(fmt.Errorf("failed to open temporary raw file: %w", err))
++			f, err = createFallbackTempFile(pattern)
++			if err != nil {
++				panic(fmt.Errorf("failed to open temporary raw file: %w", err))
++			}
+ 		}
+ 		return &tempFile{
+ 			Writer: f,
+@@ -76,6 +79,14 @@ func newTempFile(ctx BuilderContext, pattern string, testMode bool) *tempFile {
+ 	}
+ }
+ 
++func createFallbackTempFile(pattern string) (*os.File, error) {
++	tempDir := filepath.Join(os.TempDir(), "soong-raw")
++	if err := os.MkdirAll(tempDir, 0777); err != nil {
++		return nil, err
++	}
++	return os.CreateTemp(tempDir, pattern)
++}
++
+ func (t *tempFile) close() error {
+ 	if t.file != nil {
+ 		return t.file.Close()
+@@ -95,11 +106,40 @@ func (t *tempFile) rename(to string) {
+ 		os.MkdirAll(filepath.Dir(to), 0777)
+ 		err := os.Rename(t.file.Name(), to)
+ 		if err != nil {
++			if fallbackErr := copyThenRemoveTempFile(t.file.Name(), to); fallbackErr == nil {
++				return
++			}
+ 			panic(fmt.Errorf("failed to rename %s to %s: %w", t.file.Name(), to, err))
+ 		}
+ 	}
+ }
+ 
++func copyThenRemoveTempFile(from string, to string) error {
++	in, err := os.Open(from)
++	if err != nil {
++		return err
++	}
++	defer in.Close()
++
++	out, err := os.OpenFile(to, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
++	if err != nil {
++		return err
++	}
++
++	_, copyErr := io.Copy(out, in)
++	closeErr := out.Close()
++	if copyErr != nil {
++		os.Remove(to)
++		return copyErr
++	}
++	if closeErr != nil {
++		os.Remove(to)
++		return closeErr
++	}
++
++	return os.Remove(from)
++}
++
+ func (t *tempFile) remove() error {
+ 	if t.file != nil {
+ 		return os.Remove(t.file.Name())
+-- 
+2.50.1
